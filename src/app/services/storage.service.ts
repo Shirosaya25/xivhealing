@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
 import { SortSearchService } from './sort-search.service';
 
 import { Report, ReportFight, SortedFight, Friendly, Jobs } from '../models/report';
+import { Event, EventResponse } from '../models/event';
 
 @Injectable({
     providedIn: 'root'
@@ -16,6 +17,8 @@ export class StorageService {
     ready = false;
     loadingText: string;
     report: Report = null;
+
+    analyzing = false;
 
     code: string;
 
@@ -117,9 +120,6 @@ export class StorageService {
                             }
                         }
 
-                        console.log(this.sortedFights);
-                        console.log(this.report)
-                        console.log(this.fightPlayerMap);
                         this.code = code;
                         this.ready = true;
 
@@ -135,22 +135,60 @@ export class StorageService {
         );
     }
 
-    async getReportEventsByCode(code: string, fight: ReportFight) {
+    async buildEvents(code: string, view: string, fight: ReportFight): Promise<Event[]> {
+
+        let startTime = fight.start_time;
+        let endTime = fight.end_time;
+        let events: Event[] = [];
 
         return new Promise(
 
             (resolve) => {
+            
+                const eventPromise = this.buildHelper(code, view, startTime, endTime, events);
 
-                this.api.getReportEventsByCode(code, fight.start_time.toString(), fight.end_time.toString()).subscribe(
+                eventPromise.then(
 
-                    (resp: Report) => {
+                    (events: Event[]) => {
 
-                        console.log(resp);
+                        resolve(events);
                     }
                 );
             }
         );
     }
 
-    asy
+    async buildHelper(code: string, view: string, start: number, end: number, events: Event[]): Promise<Event[]> {
+
+        return new Promise(
+
+            (resolve) => {
+
+                this.api.getEventsByCode(code, view, start.toString(), end.toString()).subscribe(
+
+                    (resp: EventResponse) => {
+
+                        events = events.concat(resp.events);
+
+                        if (resp.nextPageTimestamp !== undefined) {
+
+                            const eventPromise = this.buildHelper(code, view, resp.nextPageTimestamp, end, events);
+
+                            eventPromise.then(
+
+                                (ret: Event[]) => {
+
+                                    resolve(resp.events.concat(ret))
+                                }
+                            );
+
+                        } else {
+
+                            resolve(resp.events);
+                        }
+                    }
+                )
+            }
+        );
+    }
 }

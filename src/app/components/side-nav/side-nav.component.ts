@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { ApiService } from '../../services/api.service';
 import { StorageService } from '../../services/storage.service';
+import { AnalysisService } from '../../services/analysis.service';
 
 import { ReportFight } from '../../models/report';
 
@@ -19,7 +20,8 @@ export class SideNavComponent implements OnInit {
     submitting = false;
 
     constructor(public api: ApiService,
-                public ss: StorageService) { }
+                public ss: StorageService,
+                public analysis: AnalysisService) { }
 
     ngOnInit() {
 
@@ -76,10 +78,5 @@ export class SideNavComponent implements OnInit {
         }
 
         return 'green';
-    }
-
-    loadEvents(pull: ReportFight) {
-
-        this.ss.getReportEventsByCode(this.ss.code, pull)
     }
 }

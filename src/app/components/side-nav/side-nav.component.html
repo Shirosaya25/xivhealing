@@ -53,7 +53,7 @@
 
                     <mat-list class="instance-list">
 
-                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" (click)="loadEvents(pull)" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
 
                             <p class="m-0 p-0">
                                 {{idx + 1}}
@@ -85,7 +85,7 @@
 
                     <mat-list class="instance-list">
 
-                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" (click)="loadEvents(pull)" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
 
                             <p class="m-0 p-0">
                                 {{idx + 1}}

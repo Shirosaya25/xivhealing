@@ -7,6 +7,7 @@ import { EndpointService } from '../constants/endpoint.service';
 
 import { Zone } from '../models/zone';
 import { Report, ReportFight } from '../models/report'; 
+import { Event, EventResponse } from '../models/event';
 
 @Injectable({
     providedIn: 'root'
@@ -46,11 +47,11 @@ export class ApiService {
         );
     }
 
-    getReportEventsByCode(code: string, start: string, end: string ) {
+    getEventsByCode(code: string, view: string, start: string, end: string ) {
 
-        return this.http.get<Report>(
+        return this.http.get<EventResponse>(
 
-            this.eps.GET_REPORT_EVENTS_BY_CODE.replace('{code}', code),
+            this.eps.GET_EVENTS_BY_CODE.replace('{view}', view).replace('{code}', code),
             {
                 params: {
 
