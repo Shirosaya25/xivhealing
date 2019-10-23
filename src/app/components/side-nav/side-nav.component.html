@@ -1,0 +1,112 @@
+<div class="sidebar-header">
+
+    <mat-toolbar class="search-toolbar">
+
+        <mat-icon>
+            search
+        </mat-icon>
+
+        <form class="form-url">
+            <mat-form-field class="input-url">
+
+                <input [(ngModel)]="apiUrl" [pattern]="apiRegEx" name="apiUrl" matInput placeholder="FFLogs URL" (keyup.enter)="submitUrl()">
+                <mat-error>
+                    Invalid FFlogs Url
+                </mat-error>
+
+
+            </mat-form-field>
+        </form>
+
+    </mat-toolbar>
+</div>
+
+<div *ngIf="submitting || ss.loading || ss.ready">
+
+    <hr />
+
+    <div *ngIf="submitting || ss.loading" class="spinner">
+        <mat-spinner [diameter]="30"></mat-spinner>
+    </div>
+
+    <div *ngIf="ss.ready" class="fight-container">
+
+        <mat-accordion class="mb-5">
+
+            <mat-expansion-panel *ngFor="let instance of ss.sortedFights" class="fight-tab">
+
+                <mat-expansion-panel-header>
+
+                    <mat-panel-title>
+                        {{instance.zoneName}}
+                    </mat-panel-title>
+
+                </mat-expansion-panel-header>
+
+                <div *ngIf="instance.kills.length !== 0">
+
+                    <p class="m-0 p-0">
+                        <font size="+1">Kills</font>
+                    </p>
+
+                    <hr class="mb-1 mx-0 mt-0" />
+
+                    <mat-list class="instance-list">
+
+                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" (click)="loadEvents(pull)" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+
+                            <p class="m-0 p-0">
+                                {{idx + 1}}
+                            </p>
+
+                            <p class="m-0 p-0" style="margin-left: auto!important" [ngClass]="{'text-success': pull.kill, 'text-danger': !pull.kill}">
+                                ({{toFightTime(pull.start_time, pull.end_time)}})
+                            </p>
+
+                            <small class="m-0 p-0" style="margin-left: auto!important">
+                                {{toStartTime(pull.start_time) | date: 'shortTime'}}
+                            </small>
+
+                            <mat-progress-bar style="margin-left: auto; width: 60%" mode="determinate" [appProgressBarColor]="toColor(pull.bossPercentage)"
+                                [value]="toProgress(pull.bossPercentage)"></mat-progress-bar>
+                            
+                        </mat-list-item>
+
+                    </mat-list>
+                </div>
+
+                <div *ngIf="instance.wipes.length !== 0" class="mt-3">
+
+                    <p class="m-0 p-0">
+                        <font size="+1">Wipes</font>
+                    </p>
+
+                    <hr class="mb-1 mx-0 mt-0" />
+
+                    <mat-list class="instance-list">
+
+                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" (click)="loadEvents(pull)" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+
+                            <p class="m-0 p-0">
+                                {{idx + 1}}
+                            </p>
+
+                            <p class="m-0 p-0" style="margin-left: auto!important" [ngClass]="{'text-success': pull.kill, 'text-danger': !pull.kill}">
+                                ({{toFightTime(pull.start_time, pull.end_time)}})
+                            </p>
+
+                            <small class="m-0 p-0" style="margin-left: auto!important">
+                                {{toStartTime(pull.start_time) | date: 'shortTime'}}
+                            </small>
+
+                            <mat-progress-bar style="margin-left: auto; width: 60%" mode="determinate" [appProgressBarColor]="toColor(pull.bossPercentage)"
+                                [value]="toProgress(pull.bossPercentage)"></mat-progress-bar>
+                            
+                        </mat-list-item>
+
+                    </mat-list>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

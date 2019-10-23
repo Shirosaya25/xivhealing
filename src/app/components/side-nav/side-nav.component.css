@@ -1,0 +1,66 @@
+.search-toolbar {
+
+    margin-top: 16px;
+    background-color: inherit;
+}
+
+.input-url {
+
+    width: 100%;
+    font-size: 14px;
+}
+
+.form-url {
+
+    width: 100%;
+}
+
+.spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+hr {
+
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.fight-tab {
+
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+mat-list-item {
+
+    display: flex;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+mat-list-item:hover {
+
+    background-color: #F5F5F5;
+}
+
+mat-list-item:focus {
+
+    outline: none;
+    box-shadow: none;
+}
+
+mat-list-item.active {
+
+    background-color: #F5F5F5;
+}
+
+.fight-container {
+
+    overflow-y: auto;
+    height: 80vh;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-bottom: 15px;
+}

@@ -1,0 +1,41 @@
+<mat-card>
+
+    <mat-card-header>
+
+        <mat-card-title class="p-0 m-0">
+            Participants
+        </mat-card-title>
+
+    </mat-card-header>
+
+    <hr class="my-1 mt-2" />
+
+    <mat-card-content>
+        <mat-grid-list cols="4" rowHeight="3.5:1" gutterSize="12px">
+
+            <mat-grid-tile *ngFor="let player of ss.fightPlayerMap.get(fightId)">
+                {{player.name}}
+            </mat-grid-tile>
+
+        </mat-grid-list>
+    </mat-card-content>
+
+</mat-card>
+
+<mat-card>
+
+    <mat-card-header>
+
+        <mat-card-title class="p-0 m-0">
+            Event Log
+        </mat-card-title>
+
+    </mat-card-header>
+
+    <hr class="my-1 mt-2">
+
+    <mat-card-content>
+
+    </mat-card-content>
+
+</mat-card>

@@ -1,0 +1,36 @@
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+html, body {
+
+    height: 100%;
+}
+
+body {
+
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+mat-sidenav-container {
+
+    height: 100%;
+}
+
+.mat-list-item-content {
+
+    padding: 0px!important;
+}
+
+.mat-drawer-inner-container {
+
+    overflow: hidden!important;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+.page-container {
+
+    height: 100vh;
+}
