@@ -25,7 +25,7 @@ export class StorageService {
     sortedFights: SortedFight[] = [];
     trashFights: ReportFight[] = [];
 
-    fightPlayerMap: Map<number, Friendly[]>; 
+    fightPlayerMap: Map<number, Friendly[]>;
 
     constructor(private api: ApiService,
                 private router: Router,
@@ -52,7 +52,7 @@ export class StorageService {
                     (resp: Report) => {
 
                         if (resp !== null) {
-                            
+
                             this.report = resp;
                             this.loading = false;
 
@@ -110,9 +110,9 @@ export class StorageService {
 
                                 for (const instance of player.fights) {
 
-                                    let players: Friendly[] = this.fightPlayerMap.get(instance.id) || [];
+                                    const players: Friendly[] = this.fightPlayerMap.get(instance.id) || [];
 
-                                    players.push(player)
+                                    players.push(player);
                                     players.sort(this.sorts.sortPlayersByJob);
 
                                     this.fightPlayerMap.set(instance.id, players);
@@ -137,15 +137,14 @@ export class StorageService {
 
     async buildEvents(code: string, view: string, fight: ReportFight): Promise<Event[]> {
 
-        let startTime = fight.start_time;
-        let endTime = fight.end_time;
-        let events: Event[] = [];
+        const startTime = fight.start_time;
+        const endTime = fight.end_time;
 
         return new Promise(
 
             (resolve) => {
-            
-                const eventPromise = this.buildHelper(code, view, startTime, endTime, events);
+
+                const eventPromise = this.buildHelper(code, view, startTime, endTime, []);
 
                 eventPromise.then(
 
@@ -178,7 +177,7 @@ export class StorageService {
 
                                 (ret: Event[]) => {
 
-                                    resolve(resp.events.concat(ret))
+                                    resolve(resp.events.concat(ret));
                                 }
                             );
 
@@ -187,7 +186,7 @@ export class StorageService {
                             resolve(resp.events);
                         }
                     }
-                )
+                );
             }
         );
     }

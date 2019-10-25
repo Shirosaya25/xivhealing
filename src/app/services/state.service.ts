@@ -12,7 +12,7 @@ export class StateService {
 
     getSidenavState(): boolean {
 
-        return (this.sidenavExpanded || 
+        return (this.sidenavExpanded ||
                 (!this.sidenavExpanded && this.sidenavTriggered))
                 && !(this.sidenavTriggered && this.sidenavExpanded);
     }

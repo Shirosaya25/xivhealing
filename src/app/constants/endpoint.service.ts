@@ -11,7 +11,7 @@ export class EndpointService {
 
     public readonly GET_ZONES = `${this.baseUrl}/zones`;
     public readonly GET_REPORT_BY_CODE = `${this.baseUrl}/report/fights/{code}`;
-    public readonly GET_EVENTS_BY_CODE = `${this.baseUrl}/report/events/{view}/{code}`
+    public readonly GET_EVENTS_BY_CODE = `${this.baseUrl}/report/events/{view}/{code}`;
 
     constructor() { }
 }

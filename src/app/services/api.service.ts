@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { EndpointService } from '../constants/endpoint.service';
 
 import { Zone } from '../models/zone';
-import { Report, ReportFight } from '../models/report'; 
+import { Report, ReportFight } from '../models/report';
 import { Event, EventResponse } from '../models/event';
 
 @Injectable({
@@ -18,7 +18,7 @@ export class ApiService {
     constructor(private http: HttpClient,
                 private eps: EndpointService) {}
 
-    
+
     getZones(): Observable<Zone> {
 
         return this.http.get<Zone>(

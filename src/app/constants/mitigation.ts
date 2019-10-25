@@ -4,7 +4,7 @@ const mitigation = {
 
         'rampart',
         'reprisal',
-        
+
         'sentinel',
         'sheltron',
         'hallowed ground',
@@ -50,6 +50,6 @@ const mitigation = {
 
     RDM: []
 
-}
+};
 
-export { mitigation }
+export { mitigation };

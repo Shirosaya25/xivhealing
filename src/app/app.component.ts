@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 import { StateService } from './services/state.service';
 
-import { MatIconRegistry }  from '@angular/material/icon';
+import { MatIconRegistry } from '@angular/material/icon';
 
 
 @Component({

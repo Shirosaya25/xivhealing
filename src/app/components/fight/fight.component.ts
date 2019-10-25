@@ -61,7 +61,7 @@ export class FightComponent implements OnInit {
 
                         (report: Report) => {
 
-                            console.log(this.ss.report)
+                            console.log(this.ss.report);
                             this.activePlayer = this.ss.fightPlayerMap.get(this.fightId)[0];
                             this.analysis.analyze(this.fightCode, report.fights[this.fightId - 1]);
 

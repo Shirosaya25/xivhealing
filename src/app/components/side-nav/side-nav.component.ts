@@ -72,7 +72,7 @@ export class SideNavComponent implements OnInit {
 
             return 'blue';
 
-        } else if (prog != 100) {
+        } else if (prog !== 100) {
 
             return 'purple';
         }

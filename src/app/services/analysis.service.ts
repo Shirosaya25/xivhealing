@@ -17,7 +17,7 @@ export class AnalysisService {
 
     ready: number[] = [1, 1];
 
-    fetchPromise: Promise<Event[]>
+    fetchPromise: Promise<Event[]>;
 
     damageTakenEvents: DamageTakenEvent[];
     castMap: Map<number, CastEvent[]>;
@@ -68,7 +68,6 @@ export class AnalysisService {
 
         let idx = -1;
         let lastType = '';
-        let lastTimestamp = -1;
 
         for (const event of events) {
 
@@ -129,7 +128,7 @@ export class AnalysisService {
 
             ) {
 
-                let castList = this.castMap.get(event.sourceID) || [];
+                const castList = this.castMap.get(event.sourceID) || [];
 
                 castList.push(event);
                 this.castMap.set(event.sourceID, castList);
@@ -140,14 +139,14 @@ export class AnalysisService {
 
             const player = this.ss.fightPlayerMap.get(this.fight.id).find(
 
-                (player: Friendly) => {
+                (friendly: Friendly) => {
 
-                    return player.id === key;
+                    return friendly.id === key;
                 }
             );
 
-            const mitigationEvents = eventFilterPipe.transform(this.castMap.get(key), Jobs[player.type])
-            this.mitigationMap.set(key, mitigationEvents)
+            const mitigationEvents = eventFilterPipe.transform(this.castMap.get(key), Jobs[player.type]);
+            this.mitigationMap.set(key, mitigationEvents);
         }
 
         console.log(this.mitigationMap);
