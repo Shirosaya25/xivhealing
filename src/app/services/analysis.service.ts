@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 import { EventFilterPipe } from '../pipes/event-filter.pipe';
 
 import { StorageService } from '../services/storage.service';
+import { SortSearchService } from '../services/sort-search.service';
 
-import { ReportFight, Report, Friendly } from '../models/report';
+import { ReportFight, Report, Friendly, PlayerStats } from '../models/report';
 import { Event, EventResponse, DamageTakenEvent, CastEvent } from '../models/event';
 import { Jobs } from '../models/jobs';
 
@@ -21,9 +22,14 @@ export class AnalysisService {
 
     damageTakenEvents: DamageTakenEvent[];
     castMap: Map<number, CastEvent[]>;
-    mitigationMap: Map<number, CastEvent[]>;
+    mitigationEventMap: Map<number, CastEvent[]>;
+    mitigationTableMap: Map<number, Map<string, CastEvent[]>>;
+    mitigationTableKeys: Map<number, string[]>;
 
-    constructor(private ss: StorageService) { }
+    playerStatMap: Map<number, PlayerStats>;
+
+    constructor(private ss: StorageService,
+                private sorts: SortSearchService) { }
 
     getReady() {
 
@@ -45,7 +51,11 @@ export class AnalysisService {
 
         this.damageTakenEvents = [];
         this.castMap = new Map<number, CastEvent[]>();
-        this.mitigationMap = new Map<number, CastEvent[]>();
+        this.mitigationEventMap = new Map<number, CastEvent[]>();
+        this.mitigationTableMap = new Map<number, Map<string, CastEvent[]>>();
+        this.mitigationTableKeys = new Map<number, string[]>();
+
+        this.playerStatMap = new Map<number, PlayerStats>();
 
         this.ss.buildEvents(code, 'damage-taken', fight).then(
 
@@ -93,6 +103,16 @@ export class AnalysisService {
             }
 
             if (event.type === 'damage') {
+
+                if (this.playerStatMap.get(event.targetID) === undefined) {
+
+                    const stats = {
+
+                        hp: event.targetResources.maxHitPoints
+                    };
+
+                    this.playerStatMap.set(event.targetID, stats);
+                }
 
                 this.damageTakenEvents[idx].damage.push(event);
 
@@ -146,10 +166,32 @@ export class AnalysisService {
             );
 
             const mitigationEvents = eventFilterPipe.transform(this.castMap.get(key), Jobs[player.type]);
-            this.mitigationMap.set(key, mitigationEvents);
+            this.mitigationEventMap.set(key, mitigationEvents);
+
+            for (const mitigationEvent of mitigationEvents) {
+
+                const abilityMap = this.mitigationTableMap.get(key) || new Map<string, CastEvent[]>();
+                const abilityEventList = abilityMap.get(mitigationEvent.ability.name) || [];
+                abilityEventList.push(mitigationEvent);
+
+                abilityMap.set(mitigationEvent.ability.name.toLowerCase(), abilityEventList);
+                this.mitigationTableMap.set(key, abilityMap);
+            }
+
+            if (this.mitigationTableMap.get(key) !== undefined) {
+
+                const keys: string[] = [];
+
+                for (const abilityKey of this.mitigationTableMap.get(key).keys()) {
+
+                    keys.push(abilityKey);
+                }
+
+                keys.sort(this.sorts.sortSkillsByType);
+                this.mitigationTableKeys.set(key, keys);
+            }
         }
 
-        console.log(this.mitigationMap);
         this.ready[1] = 0;
     }
 }

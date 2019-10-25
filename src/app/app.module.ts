@@ -12,6 +12,8 @@ import { SideNavComponent } from './components/side-nav/side-nav.component';
 import { ReportComponent } from './components/report/report.component';
 import { FightComponent } from './components/fight/fight.component';
 
+import { EventFilterPipe } from './pipes/event-filter.pipe';
+
 import { ProgressBarColorDirective } from './directives/progress-bar-color.directive';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -27,7 +29,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
-import { EventFilterPipe } from './pipes/event-filter.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
+
 
 @NgModule({
     declarations: [
@@ -37,7 +41,8 @@ import { EventFilterPipe } from './pipes/event-filter.pipe';
         ReportComponent,
         ProgressBarColorDirective,
         FightComponent,
-        EventFilterPipe
+        EventFilterPipe,
+        AbilityFilterPipe
     ],
 
     imports: [
@@ -47,7 +52,7 @@ import { EventFilterPipe } from './pipes/event-filter.pipe';
         MatToolbarModule, MatIconModule, MatProgressSpinnerModule,
         MatTreeModule, MatExpansionModule, MatListModule,
         MatGridListModule, MatProgressBarModule, MatCardModule,
-        MatRippleModule
+        MatRippleModule, MatTooltipModule
     ],
 
     providers: [],

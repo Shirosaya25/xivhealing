@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Friendly } from '../models/report';
+import { priority } from '../constants/mitigation';
 
 @Injectable({
     providedIn: 'root'
@@ -38,6 +39,22 @@ export class SortSearchService {
         }
 
         if (jobsPriority[p1.type] > jobsPriority[p2.type]) {
+
+            return 1;
+        }
+
+        return 0;
+    }
+
+    sortSkillsByType(s1: string, s2: string) {
+
+
+        if (priority[s1.toLowerCase()] < priority[s2.toLowerCase()]) {
+
+            return -1;
+        }
+
+        if (priority[s1.toLowerCase()] > priority[s2.toLowerCase()]) {
 
             return 1;
         }

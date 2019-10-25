@@ -108,3 +108,8 @@ export enum Jobs {
     'e1' = 'Summoner',
     'e2' = 'RedMage'
 }
+
+export interface PlayerStats {
+
+    hp: number;
+}
