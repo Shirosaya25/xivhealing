@@ -1,7 +1,8 @@
 <div class="page-container" style="overflow: hidden;">
     <mat-toolbar color="primary">
         
-        <mat-icon (click)="sidenav.toggle()">
+        
+        <mat-icon matRipple class="icon-display" (click)="sidenav.toggle(); state.sidenavTriggered = true">
             menu
         </mat-icon>
 
@@ -13,7 +14,8 @@
 
     <mat-sidenav-container class="container-flush">
 
-        <mat-sidenav #sidenav mode="side" [(opened)]="sidenavExpanded" class="col-4 p-0" style="overflow: hidden;">
+        <mat-sidenav #sidenav mode="side" [(opened)]="state.sidenavExpanded" class="col-4 p-0" style="overflow: hidden;"
+            (opened)="state.sidenavTriggered = false" (closed)="state.sidenavTriggered = false">
 
             <app-side-nav></app-side-nav>
 

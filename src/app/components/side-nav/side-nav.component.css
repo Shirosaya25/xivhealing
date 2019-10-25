@@ -38,22 +38,18 @@ mat-list-item {
     display: flex;
     justify-content: flex-start;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
-mat-list-item:hover {
+mat-list-item.active {
 
-    background-color: #F5F5F5;
+    border: 1px solid white;
+    border-radius: 4px;
 }
 
 mat-list-item:focus {
 
     outline: none;
-    box-shadow: none;
-}
-
-mat-list-item.active {
-
-    background-color: #F5F5F5;
 }
 
 .fight-container {
@@ -63,4 +59,10 @@ mat-list-item.active {
     margin-left: 10px;
     margin-right: 10px;
     padding-bottom: 15px;
+}
+
+.sidebar-header {
+
+    margin-left: 10px;
+    margin-right: 10px;
 }

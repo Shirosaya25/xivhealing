@@ -1,6 +1,6 @@
 <div class="sidebar-header">
 
-    <mat-toolbar class="search-toolbar">
+    <mat-toolbar class="search-toolbar mat-elevation-z2">
 
         <mat-icon>
             search
@@ -26,7 +26,7 @@
     <hr />
 
     <div *ngIf="submitting || ss.loading" class="spinner">
-        <mat-spinner [diameter]="30"></mat-spinner>
+        <mat-spinner color="accent" [diameter]="30"></mat-spinner>
     </div>
 
     <div *ngIf="ss.ready" class="fight-container">
@@ -53,7 +53,8 @@
 
                     <mat-list class="instance-list">
 
-                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active mat-elevation-z6"
+                            class="px-2">
 
                             <p class="m-0 p-0">
                                 {{idx + 1}}
@@ -85,7 +86,8 @@
 
                     <mat-list class="instance-list">
 
-                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active">
+                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active"
+                            class="px-2">
 
                             <p class="m-0 p-0">
                                 {{idx + 1}}

@@ -26,6 +26,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatRippleModule } from '@angular/material/core';
+import { EventFilterPipe } from './pipes/event-filter.pipe';
 
 @NgModule({
     declarations: [
@@ -34,7 +36,8 @@ import { MatCardModule } from '@angular/material/card';
         SideNavComponent,
         ReportComponent,
         ProgressBarColorDirective,
-        FightComponent
+        FightComponent,
+        EventFilterPipe
     ],
 
     imports: [
@@ -43,7 +46,8 @@ import { MatCardModule } from '@angular/material/card';
         MatSidenavModule, MatInputModule, MatFormFieldModule,
         MatToolbarModule, MatIconModule, MatProgressSpinnerModule,
         MatTreeModule, MatExpansionModule, MatListModule,
-        MatGridListModule, MatProgressBarModule, MatCardModule
+        MatGridListModule, MatProgressBarModule, MatCardModule,
+        MatRippleModule
     ],
 
     providers: [],
