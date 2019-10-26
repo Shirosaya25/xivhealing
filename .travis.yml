@@ -1,0 +1,16 @@
+# whitelist
+branches:
+  only:
+    - dev
+
+language: node_js
+node_js:
+  - "9"
+dist: trusty
+sudo: required
+before_script:
+  - npm install -g @angular/cli
+script:
+- ng lint
+- ng build --prod --base-href https://github.com/Shirosaya25/xivhealing
+- npm run sonar
