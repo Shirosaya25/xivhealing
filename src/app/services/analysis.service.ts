@@ -171,7 +171,7 @@ export class AnalysisService {
             for (const mitigationEvent of mitigationEvents) {
 
                 const abilityMap = this.mitigationTableMap.get(key) || new Map<string, CastEvent[]>();
-                const abilityEventList = abilityMap.get(mitigationEvent.ability.name) || [];
+                const abilityEventList = abilityMap.get(mitigationEvent.ability.name.toLowerCase()) || [];
                 abilityEventList.push(mitigationEvent);
 
                 abilityMap.set(mitigationEvent.ability.name.toLowerCase(), abilityEventList);

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Friendly } from '../models/report';
-import { priority } from '../constants/mitigation';
+import { skills } from '../constants/mitigation';
 
 @Injectable({
     providedIn: 'root'
@@ -48,13 +48,12 @@ export class SortSearchService {
 
     sortSkillsByType(s1: string, s2: string) {
 
-
-        if (priority[s1.toLowerCase()] < priority[s2.toLowerCase()]) {
+        if (skills[s1.toLowerCase()].priority.substring(0, 3) < skills[s2.toLowerCase()].priority.substring(0, 3)) {
 
             return -1;
         }
 
-        if (priority[s1.toLowerCase()] > priority[s2.toLowerCase()]) {
+        if (skills[s1.toLowerCase()].priority.substring(0, 3) > skills[s2.toLowerCase()].priority.substring(0, 3)) {
 
             return 1;
         }

@@ -11,7 +11,7 @@ import { StateService } from '../../services/state.service';
 
 import { Report, Friendly } from '../../models/report';
 import { Jobs } from '../../models/jobs';
-import { mitigation, descriptions } from '../../constants/mitigation';
+import { skills, mitigation } from '../../constants/mitigation';
 
 export const abilityIconTooltip: MatTooltipDefaultOptions = {
     showDelay: 500,
@@ -39,8 +39,11 @@ export class FightComponent implements OnInit {
     reportPromise: Promise<Report>;
     activePlayer: Friendly;
 
+    activeSkillMap: Map<number, string>;
+
+    abilities = skills;
+    abilityNames = Object.keys(this.abilities);
     availableMitigation = mitigation;
-    abilityDescriptions = descriptions;
 
     constructor(private route: ActivatedRoute,
                 public ss: StorageService,
@@ -84,6 +87,15 @@ export class FightComponent implements OnInit {
                         (report: Report) => {
 
                             this.activePlayer = this.ss.fightPlayerMap.get(this.fightId)[0];
+
+                            this.activeSkillMap = new Map<number, string>();
+
+                            for (const player of this.ss.fightPlayerMap.get(this.fightId)) {
+
+                                this.activeSkillMap.set(player.id, this.availableMitigation[this.jobs[player.type]][0]);
+
+                            }
+
                             this.analysis.analyze(this.fightCode, report.fights[this.fightId - 1]);
 
                         }
@@ -111,10 +123,8 @@ export class FightComponent implements OnInit {
      */
     getIcon(ability: string) {
 
-        const eventList = this.analysis.mitigationTableMap.get(this.activePlayer.id).get(ability);
-        const abilityIcon = eventList[0].ability.abilityIcon;
-        const folderDir = abilityIcon.toString().substring(0, 6);
-        const iconDir = abilityIcon.toString().substring(7, 13);
+        const folderDir = ability.toString().substring(0, 6);
+        const iconDir = ability.toString().substring(7, 13);
 
         return `../../../assets/icons/${folderDir}/${iconDir}.png`;
     }

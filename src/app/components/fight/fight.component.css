@@ -71,4 +71,30 @@ mat-grid-tile.active {
 .ability-container {
 
     width: 50%;
+    display: inline-block;
+    height: 270px;
+}
+
+.ability-unused {
+
+    filter: grayscale(90%);
+}
+
+.ability-active {
+
+    border: 1px solid white;
+}
+
+.usage-container {
+
+    width: 50%;
+    display: inline-block;
+    height: 270px;
+}
+
+.ability-event-container {
+
+    width: 90%;
+    height: 80%;
+    margin-left: 20px;
 }

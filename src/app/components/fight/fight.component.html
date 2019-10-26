@@ -39,21 +39,24 @@
 
                 <hr class="my-1 mt-2">
 
-                <div class="content-display" *ngIf="analysis.mitigationTableMap.get(activePlayer.id) !== undefined">
+                <div class="content-display row" *ngIf="analysis.mitigationTableMap.get(activePlayer.id) !== undefined">
 
-                    <div class="ability-container">
+                    <div class="ability-container col" *ngIf="(availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'a').length !== 0">
 
-                        <div class="raidwide-container" *ngIf="(analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'a').length !== 0">
+                        <div class="raidwide-container">
 
                             <p class="mb-2 mt-3">Raidwide Mitigation</p>
 
                             <div class="icon-container">
 
-                                <div *ngFor="let key of analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'a'" class="ability-icon-container">
+                                <div *ngFor="let key of availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'a'" class="ability-icon-container">
 
-                                    <span [matTooltip]="abilityDescriptions[key.toLowerCase()]" [matTooltipClass]="'ability-tooltip'">
+                                    <span [matTooltip]="abilities[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
 
-                                        <img [src]="getIcon(key)" class="ability-icon mat-elevation-z6">
+                                        <img [src]="getIcon(abilities[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
 
                                     </span>
 
@@ -63,17 +66,20 @@
 
                         </div>
 
-                        <div class="personal-container" *ngIf="(analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'b').length !== 0">
+                        <div class="personal-container" *ngIf="(availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'b').length !== 0">
 
-                            <p class="mb-2 mt-3">Personal Mitigation</p>
+                            <p class="mb-2 mt-3">Single Target Mitigation</p>
 
                             <div class="icon-container">
 
-                                <div *ngFor="let key of analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'b'" class="ability-icon-container">
+                                <div *ngFor="let key of availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'b'" class="ability-icon-container">
 
-                                    <span [matTooltip]="abilityDescriptions[key.toLowerCase()]" [matTooltipClass]="'ability-tooltip'">
+                                    <span [matTooltip]="abilities[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
 
-                                        <img [src]="getIcon(key)" class="ability-icon mat-elevation-z6">
+                                        <img [src]="getIcon(abilities[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
 
                                     </span>
 
@@ -83,17 +89,20 @@
 
                         </div>
 
-                        <div class="healing-container" *ngIf="(analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'c').length !== 0">
+                        <div class="healing-container" *ngIf="(availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'c').length !== 0">
 
                             <p class="mb-2 mt-3">Healing</p>
 
                             <div class="icon-container">
 
-                                <div *ngFor="let key of analysis.mitigationTableKeys.get(activePlayer.id) | abilityFilter: 'c'" class="ability-icon-container">
+                                <div *ngFor="let key of availableMitigation[jobs[activePlayer.type]] | abilityFilter: 'c'" class="ability-icon-container">
 
-                                    <span [matTooltip]="abilityDescriptions[key.toLowerCase()]" [matTooltipClass]="'ability-tooltip'">
+                                    <span [matTooltip]="abilities[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
 
-                                        <img [src]="getIcon(key)" class="ability-icon mat-elevation-z6">
+                                        <img [src]="getIcon(abilities[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
 
                                     </span>
 
@@ -102,6 +111,17 @@
                             </div>
 
                         </div>
+                    </div>
+
+                    <div class="usage-container col">
+
+                        <mat-list *ngIf="analysis.mitigationTableMap.get(activePlayer.id).get(activeSkillMap.get(activePlayer.id)) as events">
+
+                            <mat-list-item *ngFor="let event of events">
+                                {{event.ability.name}} {{events.length}}
+                            </mat-list-item>
+                        </mat-list>
+
                     </div>
                 </div>
 

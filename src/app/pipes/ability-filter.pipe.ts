@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { priority } from '../constants/mitigation';
+import { skills } from '../constants/mitigation';
 
 @Pipe({
     name: 'abilityFilter'
@@ -13,7 +13,7 @@ export class AbilityFilterPipe implements PipeTransform {
 
             (ability: string) => {
 
-                return priority[ability.toLowerCase()] ? priority[ability.toLowerCase()].includes(filter) : false;
+                return skills[ability.toLowerCase()].priority ? skills[ability.toLowerCase()].priority.includes(filter) : false;
             }
         );
     }
