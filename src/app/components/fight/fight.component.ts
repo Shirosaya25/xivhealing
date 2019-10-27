@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Observable } from 'rxjs';
 
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
 
+import * as CanvasJS from 'src/assets/canvasjs.min';
+
 import { StorageService } from '../../services/storage.service';
 import { AnalysisService } from '../../services/analysis.service';
 import { StateService } from '../../services/state.service';
 
 import { Report, Friendly } from '../../models/report';
-import { Jobs } from '../../models/jobs';
-import { skills, mitigation } from '../../constants/mitigation';
+
+import { jobs } from '../../constants/jobs';
+import { skills } from '../../constants/skills';
 
 export const abilityIconTooltip: MatTooltipDefaultOptions = {
     showDelay: 500,
@@ -34,16 +37,15 @@ export class FightComponent implements OnInit {
 
     fightCode: string;
     fightId: number;
-    jobs = Jobs;
 
     reportPromise: Promise<Report>;
     activePlayer: Friendly;
 
     activeSkillMap: Map<number, string>;
 
-    abilities = skills;
-    abilityNames = Object.keys(this.abilities);
-    availableMitigation = mitigation;
+    skillList = skills;
+    skillNames = Object.keys(this.skillList);
+    jobList = jobs;
 
     constructor(private route: ActivatedRoute,
                 public ss: StorageService,
@@ -56,6 +58,8 @@ export class FightComponent implements OnInit {
      * Given that a valid fight ID is present
      */
     ngOnInit() {
+
+        this.analysis.readyEmitter
 
         this.route.paramMap.subscribe(
 
@@ -92,7 +96,7 @@ export class FightComponent implements OnInit {
 
                             for (const player of this.ss.fightPlayerMap.get(this.fightId)) {
 
-                                this.activeSkillMap.set(player.id, this.availableMitigation[this.jobs[player.type]][0]);
+                                this.activeSkillMap.set(player.id, this.jobList[player.type.toLowerCase()].defensive[0]);
 
                             }
 
@@ -103,6 +107,14 @@ export class FightComponent implements OnInit {
                 }
             }
         );
+    }
+
+    @ViewChild('infoCard') set playerLoaded(val) {
+
+        if (this.analysis.ready) {
+
+            this.renderHpChart();
+        }
     }
 
     /**
@@ -127,5 +139,55 @@ export class FightComponent implements OnInit {
         const iconDir = ability.toString().substring(7, 13);
 
         return `../../../assets/icons/${folderDir}/${iconDir}.png`;
+    }
+
+    renderHpChart() {
+
+
+        let data = [];
+
+        for (const event of this.analysis.damageTakenEventMap.get(this.activePlayer.id)) {
+
+            if (event.damageTimestamp !== -1) {
+
+                data.push(
+
+                    {
+                        x: event.damageTimestamp,
+                        y: event.damage[0].targetResources.hitPoints
+                    }
+                );
+            }
+        }
+
+        let chart = new CanvasJS.Chart(
+
+            "chartContainer",
+            {
+                zoomEnabled: true,
+                animationEnabled: true,
+                exportEnabled: true,
+
+                title: {
+
+                    text: "Performance Demo - 10000 DataPoints"
+                },
+
+                subtitles: [
+                    {
+                        text: "Try Zooming and Panning"
+                    }
+                ],
+                data: [
+                    {
+                        type: "line",                
+                        dataPoints: data
+                    }
+                ]
+            }
+        );
+    
+
+        chart.render();
     }
 }

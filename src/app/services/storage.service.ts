@@ -5,8 +5,10 @@ import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { SortSearchService } from './sort-search.service';
 
-import { Report, ReportFight, SortedFight, Friendly, Jobs } from '../models/report';
+import { Report, ReportFight, SortedFight, Friendly } from '../models/report';
 import { Event, EventResponse } from '../models/event';
+
+import { jobs } from '../constants/jobs';
 
 @Injectable({
     providedIn: 'root'
@@ -106,7 +108,7 @@ export class StorageService {
 
                         for (const player of this.report.friendlies) {
 
-                            if (Object.values(Jobs).some(job => job === player.type)) {
+                            if (jobs[player.type.toLowerCase()] !== undefined) {
 
                                 for (const instance of player.fights) {
 

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { skills } from '../constants/mitigation';
+import { skills } from '../constants/skills';
 
 @Pipe({
     name: 'abilityFilter'

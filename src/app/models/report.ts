@@ -88,27 +88,6 @@ export interface SortedFight {
     wipes: ReportFight[];
 }
 
-export enum Jobs {
-
-    'a0' = 'Paladin',
-    'a1' = 'Warrior',
-    'a2' = 'Dark Knight',
-    'a3' = 'Gunbreaker',
-    'b0' = 'White Mage',
-    'b1' = 'Scholar',
-    'b2' = 'Astrologian',
-    'c0' = 'Monk',
-    'c1' = 'Dragoon',
-    'c2' = 'Ninja',
-    'c3' = 'Samurai',
-    'd0' = 'Bard',
-    'd1' = 'Machinist',
-    'd2' = 'Dancer',
-    'e0' = 'Black Mage',
-    'e1' = 'Summoner',
-    'e2' = 'RedMage'
-}
-
 export interface PlayerStats {
 
     hp: number;

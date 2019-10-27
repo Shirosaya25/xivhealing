@@ -1,120 +1,3 @@
-const mitigation = {
-
-    PLD: [
-
-        'reprisal',
-        'rampart',
-
-        'sentinel',
-        'sheltron',
-        'hallowed ground',
-        'intervention',
-        'divine veil',
-        'passage of arms',
-        'clemency'
-    ],
-
-    WAR: [
-
-        'reprisal',
-        'rampart',
-
-        'shake it off',
-        'raw intuition',
-        'vengeance',
-        'holmgang',
-        'nascent flash',
-        'equilibrium',
-        'thrill of battle'
-    ],
-
-    DRK: [
-
-        'reprisal',
-        'rampart',
-    ],
-
-    GBN: [
-
-        'reprisal',
-        'rampart',
-    ],
-
-    WHM: [
-
-        'cure'
-    ],
-
-    SCH: [
-
-        'physick'
-    ],
-
-    AST: [
-
-        'benefic'
-    ],
-
-    MNK: [
-
-        'feint',
-        'second wind',
-        'bloodbath'
-    ],
-
-    DRG: [
-
-        'feint',
-        'second wind',
-        'bloodbath'
-    ],
-
-    NIN: [
-
-        'feint',
-        'second wind',
-        'bloodbath'
-    ],
-
-    SAM: [
-
-        'feint',
-        'second wind',
-        'bloodbath'
-    ],
-
-    BRD: [
-
-        'troubadour'
-    ],
-
-    MCH: [
-
-        'tactician'
-    ],
-
-    DNC: [
-
-        'shield samba'
-    ],
-
-    BLM: [
-
-        'addle'
-    ],
-
-    SMN: [
-
-        'addle'
-    ],
-
-    RDM: [
-
-        'addle'
-    ]
-
-};
-
 const skills = {
 
     /** Raidwide */
@@ -124,7 +7,7 @@ const skills = {
         type: 'ability',
         cost: 0,
         resource: '',
-        priority: 'a00t',
+        priority: 'a00',
         path: '000000-000806',
         desc: 'Reprisal - Single Enemy\n' +
             ' - Reduces target\'s damage dealt by 10%\n' +
@@ -138,11 +21,25 @@ const skills = {
         type: 'ability',
         cost: 0,
         resource: '',
-        priority: 'a01m',
+        priority: 'a01',
         path: '000000-000828',
         desc: 'Feint - Single Enemy\n' +
             ' - Reduces target\'s physical damage dealt by 10%\n' +
             ' - Duration 10s\n' +
+            ' - Recast: 90s'
+    },
+
+    addle: {
+
+        name: 'Addle',
+        type: 'ability',
+        cost: 0,
+        resource: '',
+        priority: 'a02',
+        path: '000000-000861',
+        desc: 'Addle - Single Enemy\n' +
+            ' - Reduces target\'s magical damage dealt by 10%\n' +
+            ' - Duration: 10s\n' +
             ' - Recast: 90s'
     },
 
@@ -169,9 +66,9 @@ const skills = {
         priority: 'a11',
         path: '002000-002515',
         desc: 'Passage of Arms - Party\n' +
-                '- Increases block rate to 100% and decreases damage taken by party members standing behind you by 15%\n' +
-                '- Duration: 18s\n' +
-                ' - Recast: 150s'
+            ' - Increases block rate to 100% and decreases damage taken by party members standing behind you by 15%\n' +
+            ' - Duration: 18s\n' +
+            ' - Recast: 150s'
     },
 
     'shake it off': {
@@ -190,6 +87,21 @@ const skills = {
             ' - Recast: 90s'
     },
 
+    'shield samba': {
+
+        name: 'Shield Samba',
+        type: 'ability',
+        cost: 0,
+        resource: '',
+        priority: 'a70',
+        path: '003000-003469',
+        desc: 'Shield Samba - Party\n' +
+            ' - Reduces damage taken by self and nearby party members by 10%\n' +
+            ' - Duration: 15s\n' +
+            ' - Recast: 180s\n' +
+            ' - Cannot be stacked with Troubadour or Tactician'
+    },
+
     /** Single Target */
 
     rampart: {
@@ -198,7 +110,7 @@ const skills = {
         type: 'ability',
         cost: 0,
         resource: '',
-        priority: 'b00t',
+        priority: 'b00',
         path: '000000-000801',
         desc: 'Rampart - Self\n' +
             ' - Reduces damage taken by 20%\n' +
@@ -257,7 +169,7 @@ const skills = {
         priority: 'b13',
         path: '002000-002512',
         desc: 'Intervention - Single Ally\n' +
-            '- Reduces target party member\'s damage taken by 5%\n' +
+            ' - Reduces target party member\'s damage taken by 5%\n' +
             ' - Duration: 6s\n' +
             ' - Additional Effect: Increases damage reduction by another 50% of the effect of Rampart or Sentinel if either are active\n' +
             ' - Oath Gauge Cost: 50'
@@ -288,7 +200,7 @@ const skills = {
         path: '000000-000267',
         desc: 'Vengeance - Self\n' +
             ' - Reduces damage taken by 30%\n' +
-            '- Additional Effect: Delivers an attack with a potency of 55 each time you suffer physical damage\n' +
+            ' - Additional Effect: Delivers an attack with a potency of 55 each time you suffer physical damage\n' +
             ' - Duration: 10s\n' +
             ' - Recast: 120s\n'
     },
@@ -314,7 +226,7 @@ const skills = {
         type: 'ability',
         cost: 0,
         resource: '',
-        priority: 'c00m',
+        priority: 'c00',
         path: '000000-000823',
         desc: 'Bloodbath - Self\n' +
             ' - Converts a portion of physical damage dealt into HP\n' +
@@ -328,7 +240,7 @@ const skills = {
         type: 'ability',
         cost: 0,
         resource: '',
-        priority: 'c01mr',
+        priority: 'c01',
         path: '000000-000821',
         desc: 'Second Wind - Self\n' +
             ' - Restores own HP\n' +
@@ -398,4 +310,4 @@ const skills = {
 
 };
 
-export { mitigation, skills};
+export { skills };

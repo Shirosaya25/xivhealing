@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { mitigation } from '../constants/mitigation';
+import { jobs } from '../constants/jobs';
 
+import { Friendly } from '../models/report';
 import { CastEvent } from '../models/event';
 
 @Pipe({
@@ -9,13 +10,13 @@ import { CastEvent } from '../models/event';
 })
 export class EventFilterPipe implements PipeTransform {
 
-    transform(events: CastEvent[], job: string): CastEvent[] {
+    transform(events: CastEvent[], player: Friendly): CastEvent[] {
 
         return events.filter(
 
             (event: CastEvent) => {
 
-                return mitigation[job].some(
+                return jobs[player.type.toLowerCase()].defensive.some(
 
                     (ability: string) => {
 

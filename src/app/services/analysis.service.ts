@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter, Output } from '@angular/core';
 
 import { EventFilterPipe } from '../pipes/event-filter.pipe';
 
@@ -7,7 +7,6 @@ import { SortSearchService } from '../services/sort-search.service';
 
 import { ReportFight, Report, Friendly, PlayerStats } from '../models/report';
 import { Event, EventResponse, DamageTakenEvent, CastEvent } from '../models/event';
-import { Jobs } from '../models/jobs';
 
 @Injectable({
     providedIn: 'root'
@@ -16,11 +15,11 @@ export class AnalysisService {
 
     fight: ReportFight;
 
-    ready: number[] = [1, 1];
-
     fetchPromise: Promise<Event[]>;
 
     damageTakenEvents: DamageTakenEvent[];
+    damageTakenEventMap: Map<number, DamageTakenEvent[]>;
+
     castMap: Map<number, CastEvent[]>;
     mitigationEventMap: Map<number, CastEvent[]>;
     mitigationTableMap: Map<number, Map<string, CastEvent[]>>;
@@ -28,28 +27,24 @@ export class AnalysisService {
 
     playerStatMap: Map<number, PlayerStats>;
 
+    ready = false;
+    
+    @Output() operationEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() readyEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+
     constructor(private ss: StorageService,
                 private sorts: SortSearchService) { }
 
-    getReady() {
 
-        let sum = 0;
+    async analyze(code: string, fight: ReportFight): Promise<boolean> {
 
-        for (const n of this.ready) {
-
-            sum += n;
-        }
-
-        return sum;
-    }
-
-    async analyze(code: string, fight: ReportFight) {
-
-        this.ready = [1, 1];
+        this.readyEmitter.emit(false);
 
         this.fight = fight;
 
         this.damageTakenEvents = [];
+        this.damageTakenEventMap = new Map<number, DamageTakenEvent[]>();
+
         this.castMap = new Map<number, CastEvent[]>();
         this.mitigationEventMap = new Map<number, CastEvent[]>();
         this.mitigationTableMap = new Map<number, Map<string, CastEvent[]>>();
@@ -72,30 +67,110 @@ export class AnalysisService {
                 this.sortCasts(events);
             }
         );
+
+        return new Promise(
+
+            (resolve) => {
+
+                let counter = 0;
+
+                this.operationEmitter.subscribe(
+
+                    (done) => {
+
+                        counter++;
+
+                        if (counter === 2) {
+
+                            this.ready = true;
+                            this.readyEmitter.emit(true);
+                            resolve(true);
+                        }
+                    }
+                );
+            }
+        );
     }
 
     async sortDamageTaken(events: Event[]) {
 
         let idx = -1;
+        let playerIdx = new Map<number, number>();
+        let playerDamageIdx = new Map<number, number>();
+
+        for (const player of this.ss.fightPlayerMap.get(this.fight.id)) {
+
+            playerIdx.set(player.id, -1);
+            playerDamageIdx.set(player.id, -1);
+        }
+
+        console.log(events);
+
         let lastType = '';
+        let lastPlayer = -1;
 
         for (const event of events) {
 
-            if (event.type !== lastType && (lastType === '' || lastType === 'damage')) {
+            if (event.type === 'calculateddamage') {
 
-                idx ++;
+                playerIdx.set(event.targetID, playerIdx.get(event.targetID) + 1);
 
-                this.damageTakenEvents.push(
+                const damageTakenEventList = this.damageTakenEventMap.get(event.targetID) || [];
+                const newDamageTakenEvent: DamageTakenEvent = {
 
-                    {
+                    ability: event.ability,
+                    calculated: [],
+                    calculatedTimestamp: event.timestamp,
+                    damage: [],
+                    damageTimestamp: -1,
+                    lethal: false
+                };
+                
+                damageTakenEventList.push(newDamageTakenEvent);
+                this.damageTakenEventMap.set(event.targetID, damageTakenEventList);
+
+                lastPlayer = event.targetID;
+
+            } else {
+
+                playerDamageIdx.set(event.targetID, playerDamageIdx.get(event.targetID) + 1);
+
+                const damageTakenEventList = this.damageTakenEventMap.get(event.targetID) || [];
+
+                if (damageTakenEventList[playerDamageIdx.get(event.targetID)] === undefined) {
+
+                    const newDamageTakenEvent: DamageTakenEvent = {
+
                         ability: event.ability,
                         calculated: [],
                         calculatedTimestamp: event.timestamp,
                         damage: [],
                         damageTimestamp: -1,
                         lethal: false
-                    }
-                );
+                    };
+                    
+                    damageTakenEventList.push(newDamageTakenEvent);
+                    this.damageTakenEventMap.set(event.targetID, damageTakenEventList);
+
+                }
+                
+            }
+
+            if (event.type !== lastType && (lastType === '' || lastType === 'damage')) {
+
+                idx ++;
+
+                const newDamageTakenEvent: DamageTakenEvent = {
+
+                    ability: event.ability,
+                    calculated: [],
+                    calculatedTimestamp: event.timestamp,
+                    damage: [],
+                    damageTimestamp: -1,
+                    lethal: false
+                };
+
+                this.damageTakenEvents.push(newDamageTakenEvent);
 
             } else if (event.type !== lastType && (lastType === '' || lastType !== 'damage')) {
 
@@ -115,21 +190,27 @@ export class AnalysisService {
                 }
 
                 this.damageTakenEvents[idx].damage.push(event);
+                this.damageTakenEventMap.get(event.targetID)[playerDamageIdx.get(event.targetID)].damage.push(event);
+                this.damageTakenEventMap.get(event.targetID)[playerDamageIdx.get(event.targetID)].damageTimestamp = event.timestamp;
 
                 if (event.targetResources.hitPoints === 0) {
 
                     this.damageTakenEvents[idx].lethal = true;
+                    this.damageTakenEventMap.get(event.targetID)[playerDamageIdx.get(event.targetID)].lethal = true;
                 }
 
             } else {
 
                 this.damageTakenEvents[idx].calculated.push(event);
+                this.damageTakenEventMap.get(event.targetID)[playerIdx.get(event.targetID)].calculated.push(event);
             }
 
             lastType = event.type;
         }
 
-        this.ready[0] = 0;
+        console.log(this.damageTakenEventMap);
+
+        this.operationEmitter.emit(true);
     }
 
     async sortCasts(events: Event[]) {
@@ -165,13 +246,15 @@ export class AnalysisService {
                 }
             );
 
-            const mitigationEvents = eventFilterPipe.transform(this.castMap.get(key), Jobs[player.type]);
+            const mitigationEvents = eventFilterPipe.transform(this.castMap.get(key), player);
+
             this.mitigationEventMap.set(key, mitigationEvents);
 
             for (const mitigationEvent of mitigationEvents) {
 
                 const abilityMap = this.mitigationTableMap.get(key) || new Map<string, CastEvent[]>();
                 const abilityEventList = abilityMap.get(mitigationEvent.ability.name.toLowerCase()) || [];
+
                 abilityEventList.push(mitigationEvent);
 
                 abilityMap.set(mitigationEvent.ability.name.toLowerCase(), abilityEventList);
@@ -192,6 +275,6 @@ export class AnalysisService {
             }
         }
 
-        this.ready[1] = 0;
+        this.operationEmitter.emit(true);
     }
 }

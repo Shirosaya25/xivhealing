@@ -16,7 +16,6 @@
             "outputPath": "dist/xivbully",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "codeCoverage": true,
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
