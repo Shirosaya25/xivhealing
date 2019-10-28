@@ -6,7 +6,9 @@ import { StorageService } from '../services/storage.service';
 import { SortSearchService } from '../services/sort-search.service';
 
 import { ReportFight, Report, Friendly, PlayerStats } from '../models/report';
-import { Event, EventResponse, DamageTakenEvent, CastEvent } from '../models/event';
+import { Event, EventResponse, DamageTakenEvent, CastEvent, HealingEvent } from '../models/event';
+
+import { jobs } from '../constants/jobs';
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +29,11 @@ export class AnalysisService {
 
     playerStatMap: Map<number, PlayerStats>;
 
+    healingOutputMap: Map<number, HealingEvent[]>;
+    healingReceivedMap: Map<number, Map<number, HealingEvent[]>>;
+
+    timelineMap: Map<number, Event[]>;
+
     ready = false;
     
     @Output() operationEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -39,6 +46,7 @@ export class AnalysisService {
     async analyze(code: string, fight: ReportFight): Promise<boolean> {
 
         this.readyEmitter.emit(false);
+        this.ready = false;
 
         this.fight = fight;
 
@@ -52,6 +60,11 @@ export class AnalysisService {
 
         this.playerStatMap = new Map<number, PlayerStats>();
 
+        this.healingOutputMap = new Map<number, HealingEvent[]>();
+        this.healingReceivedMap = new Map<number, Map<number, HealingEvent[]>>();
+
+        this.timelineMap = new Map<number, Event[]>();
+
         this.ss.buildEvents(code, 'damage-taken', fight).then(
 
             (events: Event[]) => {
@@ -62,9 +75,17 @@ export class AnalysisService {
 
         this.ss.buildEvents(code, 'casts', fight).then(
 
-            (events: Event[]) => {
+            (events: CastEvent[]) => {
 
                 this.sortCasts(events);
+            }
+        );
+
+        this.ss.buildEvents(code, 'healing', fight).then(
+
+            (events: HealingEvent[]) => {
+
+                this.sortResources(events);
             }
         );
 
@@ -80,7 +101,11 @@ export class AnalysisService {
 
                         counter++;
 
-                        if (counter === 2) {
+                        if (counter === 3) {
+
+                            this.buildTimeline();
+
+                        } else if (counter === 4) {
 
                             this.ready = true;
                             this.readyEmitter.emit(true);
@@ -103,8 +128,6 @@ export class AnalysisService {
             playerIdx.set(player.id, -1);
             playerDamageIdx.set(player.id, -1);
         }
-
-        console.log(events);
 
         let lastType = '';
         let lastPlayer = -1;
@@ -208,12 +231,10 @@ export class AnalysisService {
             lastType = event.type;
         }
 
-        console.log(this.damageTakenEventMap);
-
         this.operationEmitter.emit(true);
     }
 
-    async sortCasts(events: Event[]) {
+    async sortCasts(events: CastEvent[]) {
 
         const eventFilterPipe = new EventFilterPipe();
 
@@ -273,6 +294,82 @@ export class AnalysisService {
                 keys.sort(this.sorts.sortSkillsByType);
                 this.mitigationTableKeys.set(key, keys);
             }
+        }
+
+        this.operationEmitter.emit(true);
+    }
+
+    async sortResources(events: HealingEvent[]) {
+
+        for (const event of events) {
+
+            if (event.type !== 'heal' || event.ability.name.toLowerCase() === 'combined hots') {
+
+                continue;
+            }
+
+            const healingMap = this.healingReceivedMap.get(event.targetID) || new Map<number, HealingEvent[]>();
+
+            const allHealingList = healingMap.get(0) || [];
+            const idHealingList = healingMap.get(event.sourceID) || [];
+
+            allHealingList.push(event);
+            idHealingList.push(event);
+
+            healingMap.set(0, allHealingList);
+            healingMap.set(event.sourceID, idHealingList);
+
+            this.healingReceivedMap.set(event.targetID, healingMap);
+
+            if (this.ss.fightPlayerMap.get(this.fight.id).some(
+
+                    (player: Friendly) => {
+
+                        return event.sourceID === player.id;
+                    }
+                )
+            ) {
+                const job = jobs[this.ss.fightPlayerIdMap.get(this.fight.id).get(event.sourceID).type.toLowerCase()];
+
+                if (job && job.role === 'healer') {
+
+                    const healingOutputList = this.healingOutputMap.get(event.sourceID) || [];
+
+                    healingOutputList.push(event);
+
+                    this.healingOutputMap.set(event.sourceID, healingOutputList);
+                }
+            }
+        }
+
+        this.operationEmitter.emit(true);
+    }
+
+    async buildTimeline() {
+
+        for (const player of this.ss.fightPlayerMap.get(this.fight.id)) {
+
+            let damageIdx = 0;
+            let healingIdx = 0;
+
+            const damageList = this.damageTakenEventMap.get(player.id);
+
+            const damageTakenList = [];
+            const healingList = this.healingReceivedMap.get(player.id).get(0);
+
+            for (const event of damageList) {
+
+                if (event.damageTimestamp === -1) {
+
+                    continue;
+                }
+
+                damageTakenList.push(event.damage[0]);
+            }
+
+            const timeline = damageTakenList.concat(healingList).sort(this.sorts.sortEventByTimestamp);
+
+            this.timelineMap.set(player.id, timeline);
         }
 
         this.operationEmitter.emit(true);

@@ -28,6 +28,7 @@ export class StorageService {
     trashFights: ReportFight[] = [];
 
     fightPlayerMap: Map<number, Friendly[]>;
+    fightPlayerIdMap: Map<number, Map<number, Friendly>>;
 
     constructor(private api: ApiService,
                 private router: Router,
@@ -42,6 +43,7 @@ export class StorageService {
         this.trashFights = null;
         this.code = '';
         this.fightPlayerMap = new Map<number, Friendly[]>();
+        this.fightPlayerIdMap = new Map<number, Map<number, Friendly>>();
 
         this.ready = false;
 
@@ -118,6 +120,10 @@ export class StorageService {
                                     players.sort(this.sorts.sortPlayersByJob);
 
                                     this.fightPlayerMap.set(instance.id, players);
+
+                                    const playerIdMap = this.fightPlayerIdMap.get(instance.id) || new Map<number, Friendly>();
+                                    playerIdMap.set(player.id, player);
+                                    this.fightPlayerIdMap.set(instance.id, playerIdMap);
                                 }
                             }
                         }

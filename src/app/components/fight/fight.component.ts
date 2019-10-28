@@ -47,6 +47,9 @@ export class FightComponent implements OnInit {
     skillNames = Object.keys(this.skillList);
     jobList = jobs;
 
+    _render = false;
+    chart: CanvasJS.Chart;
+
     constructor(private route: ActivatedRoute,
                 public ss: StorageService,
                 public analysis: AnalysisService,
@@ -59,7 +62,13 @@ export class FightComponent implements OnInit {
      */
     ngOnInit() {
 
-        this.analysis.readyEmitter
+        this.analysis.readyEmitter.subscribe(
+
+            (ready: boolean) => {
+
+                this._render = ready;
+            }
+        );
 
         this.route.paramMap.subscribe(
 
@@ -111,8 +120,9 @@ export class FightComponent implements OnInit {
 
     @ViewChild('infoCard') set playerLoaded(val) {
 
-        if (this.analysis.ready) {
+        if (this.analysis.ready && this._render) {
 
+            this._render = false;
             this.renderHpChart();
         }
     }
@@ -143,44 +153,78 @@ export class FightComponent implements OnInit {
 
     renderHpChart() {
 
+        const _self = this;
+        const data = [];
+        const events = this.analysis.timelineMap.get(this.activePlayer.id);
 
-        let data = [];
+        console.log(events);
 
-        for (const event of this.analysis.damageTakenEventMap.get(this.activePlayer.id)) {
+        const maxHp = this.analysis.playerStatMap.get(this.activePlayer.id).hp;
+        const fightStart = this.analysis.fight.start_time;
+        const fightEnd = this.analysis.fight.end_time;
 
-            if (event.damageTimestamp !== -1) {
+        for (const event of events) {
 
-                data.push(
+            data.push(
 
-                    {
-                        x: event.damageTimestamp,
-                        y: event.damage[0].targetResources.hitPoints
-                    }
-                );
-            }
+                {
+                    x: new Date(event.timestamp - fightStart),
+                    y: 100 * event.targetResources.hitPoints / maxHp
+                }
+            );
         }
 
-        let chart = new CanvasJS.Chart(
+        console.log(data);
+
+        this.chart = new CanvasJS.Chart(
 
             "chartContainer",
             {
                 zoomEnabled: true,
                 animationEnabled: true,
-                exportEnabled: true,
+                responsive: true,
+                maintainAspectRatio: false,
+                theme: 'dark2',
+                backgroundColor: '#393939',
 
-                title: {
+                toolTip: {
 
-                    text: "Performance Demo - 10000 DataPoints"
+                    fontSize: 10,
+                    backgroundColor: '#5D5D5D',
+                    borderColor: 'black',
+                    cornerRadius: 4,
+                    contentFormatter: function(e, self = _self) {
+
+                        return self.tooltipContent(e);
+                    }
                 },
 
-                subtitles: [
-                    {
-                        text: "Try Zooming and Panning"
+                axisX: {
+
+                    minimum: new Date(0),
+                    maximum: new Date(fightEnd - fightStart),
+                    margin: 0,
+                    interval: 1,
+                    intervalType: 'minute',
+                    labelFormatter: function(e) {
+
+                        return CanvasJS.formatDate(e.value, 'm:ss');
                     }
-                ],
+                },
+
+                axisY: {
+
+                    minimum: 0,
+                    maximum: 100,
+                    margin: 0,
+                    lineThickness: 1,
+                    tickLength: 0,
+                    interval: 25
+                },
+
                 data: [
                     {
-                        type: "line",                
+                        type: "stepLine",                
                         dataPoints: data
                     }
                 ]
@@ -188,6 +232,41 @@ export class FightComponent implements OnInit {
         );
     
 
-        chart.render();
+        this.chart.render();
+    }
+
+    tooltipContent(data) {
+
+        const event = this.analysis.timelineMap.get(this.activePlayer.id)[data.entries[0].index];
+        const icon = (this.getIcon(event.ability.abilityIcon)) || this.getIcon('000000-000806');
+
+        const actors = this.ss.fightPlayerIdMap.get(this.analysis.fight.id);
+
+        const curTime = data.entries[0].dataPoint.x;
+        const curHp = Math.floor(data.entries[0].dataPoint.y / 100 * this.analysis.playerStatMap.get(this.activePlayer.id).hp);
+
+        const tooltipHTML = `
+
+        <div class="event-tooltip-container">
+
+            <p class="m-0 p-0">(${this.toFightTime(0, curTime)}) - ${this.activePlayer.name}</p>
+            <p class="m-0 p-0">HP: ${curHp} (${data.entries[0].dataPoint.y.toFixed(1)}%)</p>
+
+            <hr style="border-color: white" class="m-0 p-0 mb-1"/>
+
+            <span style="display: flex;
+                align-items: center;
+                margin: 5px 0 0 5px;">
+
+                <img src="${icon}" class="ability-icon mat-elevation-z6" style = "
+                    border: 1px solid black!important;
+                    border-radius: 4px;
+                    cursor: pointer;">
+                <p class="m-0 p-0"> &nbsp;- ${event.ability.name}</p>
+            </span>
+
+        </div>`;
+
+        return tooltipHTML;
     }
 }

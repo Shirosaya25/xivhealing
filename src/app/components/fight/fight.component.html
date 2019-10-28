@@ -2,9 +2,17 @@
 
     <ng-template #loadingSpinner class="spinner">
 
-        <div class="spinner">
-            <mat-spinner color="accent" [diameter]="30"></mat-spinner>
-        </div>
+        <mat-card>
+
+            <mat-card-content>
+
+                <div class="spinner">
+                    <mat-spinner color="accent" [diameter]="30"></mat-spinner>
+                </div>
+
+            </mat-card-content>
+
+        </mat-card>
 
     </ng-template>
 
@@ -34,16 +42,7 @@
 
                 </mat-grid-list>
 
-                <div class="player-info-container mt-4">
-
-                    <p>{{activePlayer.name}}</p>
-                    <p>{{analysis.playerStatMap.get(activePlayer.id).hp}}</p>
-
-                </div>
-
-                <hr class="my-1 mt-2">
-
-                <div class="content-display row" *ngIf="analysis.mitigationTableMap.get(activePlayer.id) !== undefined">
+                <div class="content-display row mt-3" *ngIf="analysis.mitigationTableMap.get(activePlayer.id) !== undefined">
 
                     <div class="ability-container col">
 
@@ -132,7 +131,7 @@
                     </div>
                 </div>
 
-                <div id="chartContainer" style="height: 370px; width: 100%; margin-left:auto;margin-right:auto;"></div>
+                <div id="chartContainer" class="chart-container mt-3"></div>
 
             </mat-card-content>
 

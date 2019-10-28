@@ -98,3 +98,39 @@ mat-grid-tile.active {
     height: 80%;
     margin-left: 20px;
 }
+
+.chart-container {
+
+    height: 250px;
+    padding: 0 10px 0 10px;
+}
+
+.status-container {
+
+    text-align: center;
+}
+
+.spinner-wrapper {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+hr {
+
+    border-color: white!important;
+}
+
+.tooltip-ability-icon {
+
+    border: 1px solid black!important;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 0 0 5px;
+}
+
+canvas {
+
+    width: 100%!important;
+}

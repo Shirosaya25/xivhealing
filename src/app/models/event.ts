@@ -51,7 +51,7 @@ export interface DamageTakenEvent {
     lethal: boolean;
 }
 
-export class CastEvent {
+export interface CastEvent extends Event {
 
     timestamp: number;
     type: string;
@@ -61,14 +61,30 @@ export class CastEvent {
     targetIsFriendly: boolean;
     ability: Ability;
 
-    constructor(event: Event) {
+}
 
-        this.timestamp = event.timestamp;
-        this.type = event.type;
-        this.sourceID = event.sourceID;
-        this.sourceIsFriendly = event.sourceIsFriendly;
-        this.targetID = event.targetID;
-        this.targetIsFriendly = event.targetIsFriendly;
-        this.ability = event.ability;
-    }
+export interface HealingEvent extends Event {
+    timestamp: number;
+    type: string;
+    sourceID: number;
+    sourceIsFriendly: boolean;
+    targetID: number;
+    targetIsFriendly: boolean;
+    ability: Ability;
+    buffs?: string;
+    finalizedAmount?: number;
+    simulated?: boolean;
+    tick?: boolean;
+    expectedAmount?: number;
+    expectedCritRate?: number;
+    actorPotencyRatio?: number;
+    guessAmount?: number;
+    multiplier?: number;
+    directHitPercentage?: number;
+    hitType: number;
+    amount: number;
+    overheal?: number;
+    targetResources: Resources;
+    sourceInstance?: number;
+    packetID?: number;
 }

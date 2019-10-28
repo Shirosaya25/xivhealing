@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Friendly } from '../models/report';
+import { Event } from '../models/event';
 
 import { jobs } from '../constants/jobs';
 import { skills } from '../constants/skills';
@@ -35,6 +36,21 @@ export class SortSearchService {
         }
 
         if (skills[s1.toLowerCase()].priority.substring(0, 3) > skills[s2.toLowerCase()].priority.substring(0, 3)) {
+
+            return 1;
+        }
+
+        return 0;
+    }
+
+    sortEventByTimestamp(e1: Event, e2: Event) {
+
+        if (e1.timestamp < e2.timestamp) {
+
+            return -1;
+        }
+
+        if (e1.timestamp > e2.timestamp) {
 
             return 1;
         }
