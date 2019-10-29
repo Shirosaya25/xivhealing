@@ -238,6 +238,11 @@ export class AnalysisService {
 
         const eventFilterPipe = new EventFilterPipe();
 
+        for (const player of this.ss.fightPlayerMap.get(this.fight.id)) {
+
+            this.mitigationTableMap.set(player.id, new Map<string, CastEvent[]>());
+        }
+
         for (const event of events) {
 
             if (this.ss.fightPlayerMap.get(this.fight.id).some(

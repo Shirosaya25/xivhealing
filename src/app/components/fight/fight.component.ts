@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { TitleCasePipe } from '@angular/common';
+
 import { Observable } from 'rxjs';
 
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
@@ -12,9 +14,11 @@ import { AnalysisService } from '../../services/analysis.service';
 import { StateService } from '../../services/state.service';
 
 import { Report, Friendly } from '../../models/report';
+import { Event, HealingEvent } from '../../models/event';
 
 import { jobs } from '../../constants/jobs';
 import { skills } from '../../constants/skills';
+import { blacklist } from '../../constants/blacklist'
 
 export const abilityIconTooltip: MatTooltipDefaultOptions = {
     showDelay: 500,
@@ -47,7 +51,6 @@ export class FightComponent implements OnInit {
     skillNames = Object.keys(this.skillList);
     jobList = jobs;
 
-    _render = false;
     chart: CanvasJS.Chart;
 
     constructor(private route: ActivatedRoute,
@@ -61,14 +64,6 @@ export class FightComponent implements OnInit {
      * Given that a valid fight ID is present
      */
     ngOnInit() {
-
-        this.analysis.readyEmitter.subscribe(
-
-            (ready: boolean) => {
-
-                this._render = ready;
-            }
-        );
 
         this.route.paramMap.subscribe(
 
@@ -120,10 +115,9 @@ export class FightComponent implements OnInit {
 
     @ViewChild('infoCard') set playerLoaded(val) {
 
-        if (this.analysis.ready && this._render) {
+        if (this.analysis.ready) {
 
-            this._render = false;
-            this.renderHpChart();
+            this.renderHpChart(null);
         }
     }
 
@@ -151,13 +145,20 @@ export class FightComponent implements OnInit {
         return `../../../assets/icons/${folderDir}/${iconDir}.png`;
     }
 
-    renderHpChart() {
+    onAbilityClick(ability: string) {
+
+        this.activeSkillMap.set(this.activePlayer.id, ability.toLowerCase());
+        this.renderHpChart(ability);
+    }
+
+    renderHpChart(ability: string) {
 
         const _self = this;
         const data = [];
+        const castUsage = [];
         const events = this.analysis.timelineMap.get(this.activePlayer.id);
-
-        console.log(events);
+        const skills = this.analysis.mitigationTableMap.get(this.activePlayer.id);
+        const casts = skills !== undefined ? skills.get(this.activeSkillMap.get(this.activePlayer.id)) || [] : [];
 
         const maxHp = this.analysis.playerStatMap.get(this.activePlayer.id).hp;
         const fightStart = this.analysis.fight.start_time;
@@ -165,23 +166,66 @@ export class FightComponent implements OnInit {
 
         for (const event of events) {
 
-            data.push(
+            if (blacklist.some(
+
+                    (guid) => {
+
+                        return guid === event.ability.guid;
+                    }
+                )
+            ) {
+
+                data.push(
+
+                    {
+                        x: new Date(event.timestamp - fightStart),
+                        y: 100 * event.targetResources.hitPoints / maxHp,
+                        name: `healing-${event.timestamp}`,
+                        markerType: 'none'
+                    }
+                );
+
+            } else {
+
+                data.push(
+
+                    {
+                        x: new Date(event.timestamp - fightStart),
+                        y: 100 * event.targetResources.hitPoints / maxHp,
+                        name: `healing-${event.timestamp}`,
+                    }
+                );
+            }
+        }
+
+        for (const cast of casts) {
+
+            castUsage.push(
 
                 {
-                    x: new Date(event.timestamp - fightStart),
-                    y: 100 * event.targetResources.hitPoints / maxHp
+                    x: new Date(cast.timestamp - fightStart),
+                    y: 100,
+                    name: `cast-${this.activeSkillMap.get(this.activePlayer.id)}-${cast.timestamp}-1`,
+                    markerType: 'none'
+                }
+            );
+
+            castUsage.push(
+
+                {
+                    x: new Date(cast.timestamp + 50 - fightStart),
+                    y: 0,
+                    name: `cast-${this.activeSkillMap.get(this.activePlayer.id)}-${cast.timestamp}-2`,
                 }
             );
         }
-
-        console.log(data);
 
         this.chart = new CanvasJS.Chart(
 
             "chartContainer",
             {
                 zoomEnabled: true,
-                animationEnabled: true,
+                animationEnabled: false,
                 responsive: true,
                 maintainAspectRatio: false,
                 theme: 'dark2',
@@ -223,9 +267,15 @@ export class FightComponent implements OnInit {
                 },
 
                 data: [
+
                     {
-                        type: "stepLine",                
+                        type: 'stepLine',
                         dataPoints: data
+                    },
+
+                    {
+                        type: 'stepArea',
+                        dataPoints: castUsage
                     }
                 ]
             }
@@ -237,36 +287,105 @@ export class FightComponent implements OnInit {
 
     tooltipContent(data) {
 
-        const event = this.analysis.timelineMap.get(this.activePlayer.id)[data.entries[0].index];
-        const icon = (this.getIcon(event.ability.abilityIcon)) || this.getIcon('000000-000806');
+        if (data.entries[0].dataPoint.name.includes('cast')) {
 
-        const actors = this.ss.fightPlayerIdMap.get(this.analysis.fight.id);
+            const name = data.entries[0].dataPoint.name;
+            const skill = name.substring(5, name.indexOf('-', 5));
+            const curTime = data.entries[0].dataPoint.x;
 
-        const curTime = data.entries[0].dataPoint.x;
-        const curHp = Math.floor(data.entries[0].dataPoint.y / 100 * this.analysis.playerStatMap.get(this.activePlayer.id).hp);
+            const icon = this.getIcon(skills[skill].path);
+            const pipe = new TitleCasePipe();
 
-        const tooltipHTML = `
+            const tooltipHTML = `
 
-        <div class="event-tooltip-container">
+                <div class="event-tooltip-container">
 
-            <p class="m-0 p-0">(${this.toFightTime(0, curTime)}) - ${this.activePlayer.name}</p>
-            <p class="m-0 p-0">HP: ${curHp} (${data.entries[0].dataPoint.y.toFixed(1)}%)</p>
+                    <p class="m-0 p-0">(${this.toFightTime(0, curTime)}) - ${this.activePlayer.name}</p>
 
-            <hr style="border-color: white" class="m-0 p-0 mb-1"/>
+                    <hr style="border-color: white" class="m-0 p-0 mb-1"/>
 
-            <span style="display: flex;
-                align-items: center;
-                margin: 5px 0 0 5px;">
+                    <span style="display: flex;
+                        align-items: center;
+                        margin: 5px 0 0 5px;">
 
-                <img src="${icon}" class="ability-icon mat-elevation-z6" style = "
-                    border: 1px solid black!important;
-                    border-radius: 4px;
-                    cursor: pointer;">
-                <p class="m-0 p-0"> &nbsp;- ${event.ability.name}</p>
-            </span>
+                        <img src="${icon}" class="ability-icon mat-elevation-z6" style = "
+                            border: 1px solid black!important;
+                            border-radius: 4px;
+                            cursor: pointer;">
+                        <p class="m-0 p-0"> &nbsp;- ${pipe.transform(skill)}</p>
+                    </span>
 
-        </div>`;
+                </div>
+            `;
 
-        return tooltipHTML;
+            return tooltipHTML;
+
+        } else {
+
+            const event = this.analysis.timelineMap.get(this.activePlayer.id)[data.entries[0].index];
+            let icon = (this.getIcon(event.ability.abilityIcon)) || this.getIcon('000000-000103');
+
+            if (event.type !== 'heal') {
+
+                icon = this.getIcon('000000-000103');
+            }
+
+            const actors = this.ss.fightPlayerIdMap.get(this.analysis.fight.id);
+
+            const curTime = data.entries[0].dataPoint.x;
+            const curHp = Math.floor(data.entries[0].dataPoint.y / 100 * this.analysis.playerStatMap.get(this.activePlayer.id).hp);
+            const source = this.ss.fightPlayerIdMap.get(this.analysis.fight.id).get(event.sourceID);
+
+            const sourceString = source ? `<p class="m-0 p-0"> &nbsp; - From ${source.name}` :
+                event.sourceIsFriendly ? `<p class="m-0 p-0"> &nbsp; - From pet` :
+                `<p class="m-0 p-0"> &nbsp; - From enemy`;
+
+            const amountString = event.type === 'heal' ? (event as HealingEvent).overheal ?
+                `<p class="m-0 p-0"> &nbsp; - For ${event.amount} (${(event as HealingEvent).overheal})` :
+                `<p class="m-0 p-0"> &nbsp; - For ${event.amount}` :
+                `<p class="m-0 p-0"> &nbsp; - For ${event.amount}`;
+
+            if (blacklist.some(
+
+                    (guid) => {
+
+                        return guid === event.ability.guid;
+                    }
+                )
+            ) {
+
+                return null;
+            }
+
+            const tooltipHTML = `
+
+                <div class="event-tooltip-container">
+
+                    <p class="m-0 p-0">(${this.toFightTime(0, curTime)}) - ${this.activePlayer.name}</p>
+                    <p class="m-0 p-0">HP: ${curHp} (${data.entries[0].dataPoint.y.toFixed(1)}%)</p>
+
+                    <hr style="border-color: white" class="m-0 p-0 mb-1"/>
+
+                    <span style="display: flex;
+                        align-items: center;
+                        margin: 5px 0 0 5px;">
+
+                        <img src="${icon}" class="ability-icon mat-elevation-z6" style = "
+                            border: 1px solid black!important;
+                            border-radius: 4px;
+                            cursor: pointer;">
+
+                        <div>
+                            <p class="m-0 p-0"> &nbsp; - ${event.ability.name}</p>
+                            ${sourceString}
+                            ${amountString}
+                        </div>
+                    </span>
+
+                </div>
+            `;
+
+            return tooltipHTML;
+        }
     }
 }

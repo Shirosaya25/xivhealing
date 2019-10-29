@@ -13,6 +13,11 @@ export class AbilityFilterPipe implements PipeTransform {
 
             (ability: string) => {
 
+                if (skills[ability.toLowerCase()] === undefined) {
+
+                    return false;
+                }
+
                 return skills[ability.toLowerCase()].priority ? skills[ability.toLowerCase()].priority.includes(filter) : false;
             }
         );

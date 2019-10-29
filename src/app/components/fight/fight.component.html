@@ -30,7 +30,8 @@
 
             <hr class="my-1 mt-2" />
 
-            <mat-card-content>
+            <mat-card-content >
+
                 <mat-grid-list cols="8" rowHeight="3:1" gutterSize="2px">
 
                     <mat-grid-tile *ngFor="let player of ss.fightPlayerMap.get(fightId)" [ngClass]="{'active mat-elevation-z6': player.id === activePlayer.id}"
@@ -42,96 +43,87 @@
 
                 </mat-grid-list>
 
-                <div class="content-display row mt-3" *ngIf="analysis.mitigationTableMap.get(activePlayer.id) !== undefined">
+                <div *ngIf="jobList[activePlayer.type.toLowerCase()]">
 
-                    <div class="ability-container col">
+                    <div class="content-display row mt-3">
 
-                        <div *ngIf="jobList[activePlayer.type.toLowerCase()]" >
+                        <div class="raidwide-container col">
 
-                            <div class="raidwide-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'a').length !== 0">
+                            <p class="mb-2 mt-3">Raidwide Mitigation</p>
 
-                                <p class="mb-2 mt-3">Raidwide Mitigation</p>
+                            <div class="icon-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'a').length !== 0">
 
-                                <div class="icon-container">
+                                <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'a'" class="ability-icon-container">
 
-                                    <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'a'" class="ability-icon-container">
+                                    <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
 
-                                        <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
+                                        <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="onAbilityClick(key)">
 
-                                            <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
-                                                [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
-                                                'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
-                                                (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
-
-                                        </span>
-
-                                    </div>
+                                    </span>
 
                                 </div>
 
                             </div>
 
-                            <div class="personal-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'b').length !== 0">
+                        </div>
 
-                                <p class="mb-2 mt-3">Single Target Mitigation</p>
+                        <div class="personal-container col">
 
-                                <div class="icon-container">
+                            <p class="mb-2 mt-3">Single Target Mitigation</p>
 
-                                    <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'b'" class="ability-icon-container">
+                            <div class="icon-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'b').length !== 0">
 
-                                        <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
+                                <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'b'" class="ability-icon-container">
 
-                                            <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
-                                                [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
-                                                'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
-                                                (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
+                                    <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
 
-                                        </span>
+                                        <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="onAbilityClick(key)">
 
-                                    </div>
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="content-display row">
+
+                        <div class="healing-container col">
+
+                            <p class="mb-2 mt-3">Healing</p>
+
+                            <div class="icon-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'c').length !== 0">
+
+                                <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive| abilityFilter: 'c'" class="ability-icon-container">
+
+                                    <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
+
+                                        <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
+                                            [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
+                                            'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
+                                            (click)="onAbilityClick(key)">
+
+                                    </span>
 
                                 </div>
 
                             </div>
 
-                            <div class="healing-container" *ngIf="(jobList[activePlayer.type.toLowerCase()].defensive | abilityFilter: 'c').length !== 0">
-
-                                <p class="mb-2 mt-3">Healing</p>
-
-                                <div class="icon-container">
-
-                                    <div *ngFor="let key of jobList[activePlayer.type.toLowerCase()].defensive| abilityFilter: 'c'" class="ability-icon-container">
-
-                                        <span [matTooltip]="skillList[key.toLowerCase()].desc" [matTooltipClass]="'ability-tooltip'">
-
-                                            <img [src]="getIcon(skillList[key.toLowerCase()].path)" class="ability-icon mat-elevation-z6"
-                                                [ngClass]="{'ability-unused': analysis.mitigationTableMap.get(activePlayer.id).get(key.toLowerCase()) === undefined,
-                                                'ability-active': activeSkillMap.get(activePlayer.id) === key.toLowerCase()}"
-                                                (click)="activeSkillMap.set(activePlayer.id, key.toLowerCase())">
-
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
                         </div>
                     </div>
 
-                    <div class="usage-container col">
+                    <div id="chartContainer" class="chart-container mt-3"></div>
 
-                        <mat-list *ngIf="analysis.mitigationTableMap.get(activePlayer.id).get(activeSkillMap.get(activePlayer.id)) as events">
-
-                            <mat-list-item *ngFor="let event of events">
-                                {{event.ability.name}} {{events.length}}
-                            </mat-list-item>
-                        </mat-list>
-
-                    </div>
                 </div>
-
-                <div id="chartContainer" class="chart-container mt-3"></div>
 
             </mat-card-content>
 
