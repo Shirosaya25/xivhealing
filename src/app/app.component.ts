@@ -5,7 +5,7 @@ import { StateService } from './services/state.service';
 
 import { MatIconRegistry } from '@angular/material/icon';
 
-import { jobs } from './constants/jobs'; 
+import { jobs } from './constants/jobs';
 
 
 @Component({
@@ -24,7 +24,7 @@ export class AppComponent {
             this.matIconRegistry.addSvgIcon(
                 job.short,
                 this.domSanitizer.bypassSecurityTrustResourceUrl(`../assets/icons/jobs/${job.short}.svg`)
-            )
-        } 
+            );
+        }
     }
 }

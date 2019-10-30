@@ -48,7 +48,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     imports: [
         BrowserModule, AppRoutingModule, BrowserAnimationsModule,
         FormsModule, HttpClientModule, CommonModule,
-        
         MatSidenavModule, MatInputModule, MatFormFieldModule,
         MatToolbarModule, MatIconModule, MatProgressSpinnerModule,
         MatTreeModule, MatExpansionModule, MatListModule,

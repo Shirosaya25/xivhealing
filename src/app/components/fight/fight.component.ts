@@ -394,7 +394,8 @@ export class FightComponent implements OnInit {
                         <img src="${icon}" class="mat-elevation-z6" style = "
                             border: 1px solid black!important;
                             border-radius: 4px;
-                            cursor: pointer;">
+                            cursor: pointer;"
+                            alt="Ability Icon">
 
                         <div>
                             <p class="m-0 p-0"> &nbsp; - ${event.ability.name}</p>
