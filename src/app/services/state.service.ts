@@ -1,19 +1,22 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'
 })
 export class StateService {
 
-    constructor() { }
+    constructor(private snackBar: MatSnackBar) { }
 
-    sidenavExpanded = true;
-    sidenavTriggered = false;
+    openSnackBar(msg: string, dur: number) {
 
-    getSidenavState(): boolean {
+        this.snackBar.open(msg, 'Close',
 
-        return (this.sidenavExpanded ||
-                (!this.sidenavExpanded && this.sidenavTriggered))
-                && !(this.sidenavTriggered && this.sidenavExpanded);
+            {
+                duration: dur,
+                panelClass: ['snackbar'],
+                horizontalPosition: 'left'
+            }
+        );
     }
 }

@@ -18,7 +18,7 @@ import { Event, HealingEvent } from '../../models/event';
 
 import { jobs } from '../../constants/jobs';
 import { skills } from '../../constants/skills';
-import { blacklist } from '../../constants/blacklist'
+import { blacklist } from '../../constants/blacklist';
 
 export const abilityIconTooltip: MatTooltipDefaultOptions = {
     showDelay: 500,
@@ -42,7 +42,7 @@ export class FightComponent implements OnInit {
     fightCode: string;
     fightId: number;
 
-    reportPromise: Promise<Report>;
+    $reportPromise: Promise<Report>;
     activePlayer: Friendly;
 
     activeSkillMap: Map<number, string>;
@@ -73,13 +73,18 @@ export class FightComponent implements OnInit {
 
                 if (this.ss.code !== params.get('code')) {
 
-                    this.reportPromise = this.ss.getReportByCode(this.fightCode, false);
+                    this.$reportPromise = this.ss.getReportByCode(this.fightCode);
 
                 } else {
 
-                    this.reportPromise = new Promise(
+                    this.$reportPromise = new Promise(
 
-                        (resolve) => {
+                        (resolve, reject) => {
+
+                            if (!this.ss.report) {
+
+                                reject('');
+                            }
 
                             resolve(this.ss.report);
                         }
@@ -90,7 +95,7 @@ export class FightComponent implements OnInit {
 
                 if (this.fightId !== 0) {
 
-                    this.reportPromise.then(
+                    this.$reportPromise.then(
 
                         (report: Report) => {
 
@@ -106,6 +111,21 @@ export class FightComponent implements OnInit {
 
                             this.analysis.analyze(this.fightCode, report.fights[this.fightId - 1]);
 
+                        },
+
+                        (error) => {
+
+                            this.state.openSnackBar(error, 5000);
+                        }
+                    );
+
+                } else {
+
+                    this.$reportPromise.catch(
+
+                        (error) => {
+
+                            this.state.openSnackBar(error, 5000);
                         }
                     );
                 }
@@ -153,12 +173,12 @@ export class FightComponent implements OnInit {
 
     renderHpChart(ability: string) {
 
-        const _self = this;
+        const self = this;
         const data = [];
         const castUsage = [];
         const events = this.analysis.timelineMap.get(this.activePlayer.id);
-        const skills = this.analysis.mitigationTableMap.get(this.activePlayer.id);
-        const casts = skills !== undefined ? skills.get(this.activeSkillMap.get(this.activePlayer.id)) || [] : [];
+        const skillMap = this.analysis.mitigationTableMap.get(this.activePlayer.id);
+        const casts = skillMap !== undefined ? skillMap.get(this.activeSkillMap.get(this.activePlayer.id)) || [] : [];
 
         const maxHp = this.analysis.playerStatMap.get(this.activePlayer.id).hp;
         const fightStart = this.analysis.fight.start_time;
@@ -222,7 +242,8 @@ export class FightComponent implements OnInit {
 
         this.chart = new CanvasJS.Chart(
 
-            "chartContainer",
+            'chartContainer',
+
             {
                 zoomEnabled: true,
                 animationEnabled: false,
@@ -237,9 +258,10 @@ export class FightComponent implements OnInit {
                     backgroundColor: '#5D5D5D',
                     borderColor: 'black',
                     cornerRadius: 4,
-                    contentFormatter: function(e, self = _self) {
 
-                        return self.tooltipContent(e);
+                    contentFormatter(e, component = self) {
+
+                        return component.tooltipContent(e);
                     }
                 },
 
@@ -250,7 +272,8 @@ export class FightComponent implements OnInit {
                     margin: 0,
                     interval: 1,
                     intervalType: 'minute',
-                    labelFormatter: function(e) {
+
+                    labelFormatter(e) {
 
                         return CanvasJS.formatDate(e.value, 'm:ss');
                     }
@@ -280,7 +303,6 @@ export class FightComponent implements OnInit {
                 ]
             }
         );
-    
 
         this.chart.render();
     }
@@ -334,7 +356,8 @@ export class FightComponent implements OnInit {
 
             const curTime = data.entries[0].dataPoint.x;
             const curHp = Math.floor(data.entries[0].dataPoint.y / 100 * this.analysis.playerStatMap.get(this.activePlayer.id).hp);
-            const source = this.ss.fightPlayerIdMap.get(this.analysis.fight.id).get(event.sourceID);
+            const source = this.ss.fightPlayerIdMap.get(this.analysis.fight.id).get(event.sourceID) ||
+                this.ss.petIdMap.get(event.sourceID);
 
             const sourceString = source ? `<p class="m-0 p-0"> &nbsp; - From ${source.name}` :
                 event.sourceIsFriendly ? `<p class="m-0 p-0"> &nbsp; - From pet` :
@@ -368,9 +391,9 @@ export class FightComponent implements OnInit {
 
                     <span style="display: flex;
                         align-items: center;
-                        margin: 5px 0 0 5px;">
+                        margin: 0px">
 
-                        <img src="${icon}" class="ability-icon mat-elevation-z6" style = "
+                        <img src="${icon}" class="mat-elevation-z6" style = "
                             border: 1px solid black!important;
                             border-radius: 4px;
                             cursor: pointer;">

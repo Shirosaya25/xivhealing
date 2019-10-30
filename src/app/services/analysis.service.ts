@@ -4,6 +4,7 @@ import { EventFilterPipe } from '../pipes/event-filter.pipe';
 
 import { StorageService } from '../services/storage.service';
 import { SortSearchService } from '../services/sort-search.service';
+import { StateService } from '../services/state.service';
 
 import { ReportFight, Report, Friendly, PlayerStats } from '../models/report';
 import { Event, EventResponse, DamageTakenEvent, CastEvent, HealingEvent } from '../models/event';
@@ -16,8 +17,6 @@ import { jobs } from '../constants/jobs';
 export class AnalysisService {
 
     fight: ReportFight;
-
-    fetchPromise: Promise<Event[]>;
 
     damageTakenEvents: DamageTakenEvent[];
     damageTakenEventMap: Map<number, DamageTakenEvent[]>;
@@ -35,17 +34,18 @@ export class AnalysisService {
     timelineMap: Map<number, Event[]>;
 
     ready = false;
-    
-    @Output() operationEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
-    @Output() readyEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+    @Output() $operation: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() $ready: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     constructor(private ss: StorageService,
-                private sorts: SortSearchService) { }
+                private sorts: SortSearchService,
+                private state: StateService) { }
 
 
     async analyze(code: string, fight: ReportFight): Promise<boolean> {
 
-        this.readyEmitter.emit(false);
+        this.$ready.emit(false);
         this.ready = false;
 
         this.fight = fight;
@@ -70,6 +70,11 @@ export class AnalysisService {
             (events: Event[]) => {
 
                 this.sortDamageTaken(events);
+            },
+
+            (error) => {
+
+                this.state.openSnackBar(error, 5000);
             }
         );
 
@@ -78,6 +83,11 @@ export class AnalysisService {
             (events: CastEvent[]) => {
 
                 this.sortCasts(events);
+            },
+
+            (error) => {
+
+                this.state.openSnackBar(error, 5000);
             }
         );
 
@@ -86,18 +96,28 @@ export class AnalysisService {
             (events: HealingEvent[]) => {
 
                 this.sortResources(events);
+            },
+
+            (error) => {
+
+                this.state.openSnackBar(error, 5000);
             }
         );
 
         return new Promise(
 
-            (resolve) => {
+            (resolve, reject) => {
 
                 let counter = 0;
 
-                this.operationEmitter.subscribe(
+                this.$operation.subscribe(
 
                     (done) => {
+
+                        if (!done) {
+
+                            reject('Failed to build timeline');
+                        }
 
                         counter++;
 
@@ -108,7 +128,7 @@ export class AnalysisService {
                         } else if (counter === 4) {
 
                             this.ready = true;
-                            this.readyEmitter.emit(true);
+                            this.$ready.emit(true);
                             resolve(true);
                         }
                     }
@@ -120,8 +140,8 @@ export class AnalysisService {
     async sortDamageTaken(events: Event[]) {
 
         let idx = -1;
-        let playerIdx = new Map<number, number>();
-        let playerDamageIdx = new Map<number, number>();
+        const playerIdx = new Map<number, number>();
+        const playerDamageIdx = new Map<number, number>();
 
         for (const player of this.ss.fightPlayerMap.get(this.fight.id)) {
 
@@ -148,7 +168,7 @@ export class AnalysisService {
                     damageTimestamp: -1,
                     lethal: false
                 };
-                
+
                 damageTakenEventList.push(newDamageTakenEvent);
                 this.damageTakenEventMap.set(event.targetID, damageTakenEventList);
 
@@ -171,12 +191,12 @@ export class AnalysisService {
                         damageTimestamp: -1,
                         lethal: false
                     };
-                    
+
                     damageTakenEventList.push(newDamageTakenEvent);
                     this.damageTakenEventMap.set(event.targetID, damageTakenEventList);
 
                 }
-                
+
             }
 
             if (event.type !== lastType && (lastType === '' || lastType === 'damage')) {
@@ -231,7 +251,7 @@ export class AnalysisService {
             lastType = event.type;
         }
 
-        this.operationEmitter.emit(true);
+        this.$operation.emit(true);
     }
 
     async sortCasts(events: CastEvent[]) {
@@ -301,7 +321,7 @@ export class AnalysisService {
             }
         }
 
-        this.operationEmitter.emit(true);
+        this.$operation.emit(true);
     }
 
     async sortResources(events: HealingEvent[]) {
@@ -347,15 +367,12 @@ export class AnalysisService {
             }
         }
 
-        this.operationEmitter.emit(true);
+        this.$operation.emit(true);
     }
 
     async buildTimeline() {
 
         for (const player of this.ss.fightPlayerMap.get(this.fight.id)) {
-
-            let damageIdx = 0;
-            let healingIdx = 0;
 
             const damageList = this.damageTakenEventMap.get(player.id);
 
@@ -377,6 +394,6 @@ export class AnalysisService {
             this.timelineMap.set(player.id, timeline);
         }
 
-        this.operationEmitter.emit(true);
+        this.$operation.emit(true);
     }
 }

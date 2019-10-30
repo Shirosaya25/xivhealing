@@ -9,7 +9,7 @@
 
     <mat-sidenav-container class="container-flush">
 
-        <mat-sidenav #sidenav mode="side" [(opened)]="state.sidenavExpanded" class="col-4 p-0" style="overflow: hidden;"
+        <mat-sidenav #sidenav mode="side" opened="true" class="col-4 p-0" style="overflow: hidden;"
             (opened)="state.sidenavTriggered = false" (closed)="state.sidenavTriggered = false">
 
             <app-side-nav></app-side-nav>

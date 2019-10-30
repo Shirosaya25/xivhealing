@@ -14,9 +14,13 @@ export class ProgressBarColorDirective implements OnChanges {
 
     constructor(private el: ElementRef) {
 
-        const nativeEl: HTMLElement = this.el.nativeElement;
-        nativeEl.setAttribute(this.uniqueAttr, '');
-        nativeEl.appendChild(this.styleEl);
+        const nativeEl: HTMLElement = this.el ? this.el.nativeElement : null;
+
+        if (nativeEl) {
+
+            nativeEl.setAttribute(this.uniqueAttr, '');
+            nativeEl.appendChild(this.styleEl);
+        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {

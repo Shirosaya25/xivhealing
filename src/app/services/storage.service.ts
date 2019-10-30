@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpHeaderResponse } from '@angular/common/http';
+import { HttpHeaderResponse, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { ApiService } from './api.service';
 import { SortSearchService } from './sort-search.service';
 
-import { Report, ReportFight, SortedFight, Friendly } from '../models/report';
+import { Report, ReportFight, SortedFight, Friendly, FriendlyPet } from '../models/report';
 import { Event, EventResponse } from '../models/event';
 
 import { jobs } from '../constants/jobs';
@@ -18,9 +18,8 @@ export class StorageService {
     loading = false;
     ready = false;
     loadingText: string;
-    report: Report = null;
 
-    analyzing = false;
+    report: Report = null;
 
     code: string;
 
@@ -30,26 +29,35 @@ export class StorageService {
     fightPlayerMap: Map<number, Friendly[]>;
     fightPlayerIdMap: Map<number, Map<number, Friendly>>;
 
+    playerPetMap: Map<number, FriendlyPet[]>;
+    petIdMap: Map<number, FriendlyPet>;
+
     constructor(private api: ApiService,
                 private router: Router,
                 private sorts: SortSearchService) { }
 
-    async getReportByCode(code: string, nav: boolean): Promise<Report> {
+    async getReportByCode(code: string): Promise<Report> {
 
         this.loading = true;
-        this.loadingText = 'Loading Curricula...';
+        this.ready = false;
+        this.loadingText = 'Loading Reporta...';
+
         this.report = null;
-        this.sortedFights = null;
-        this.trashFights = null;
+
         this.code = '';
+
+        this.sortedFights = [];
+        this.trashFights = [];
+
         this.fightPlayerMap = new Map<number, Friendly[]>();
         this.fightPlayerIdMap = new Map<number, Map<number, Friendly>>();
 
-        this.ready = false;
+        this.playerPetMap = new Map<number, FriendlyPet[]>();
+        this.petIdMap = new Map<number, FriendlyPet>();
 
         return new Promise(
 
-            (resolve) => {
+            (resolve, reject) => {
 
                 this.api.getReportByCode(code).subscribe(
 
@@ -63,18 +71,17 @@ export class StorageService {
                         } else {
 
                             this.loading = false;
+                            reject('Report was null.');
                         }
                     },
 
-                    (error: HttpHeaderResponse) => {
+                    (resp: HttpErrorResponse) => {
 
                         this.loading = false;
+                        reject(resp.error.error);
                     },
 
                     () => {
-
-                        this.trashFights = [];
-                        this.sortedFights = [];
 
                         let lastId = -1;
                         let idx = -1;
@@ -125,16 +132,22 @@ export class StorageService {
                                     playerIdMap.set(player.id, player);
                                     this.fightPlayerIdMap.set(instance.id, playerIdMap);
                                 }
+
+                                this.playerPetMap.set(player.id, []);
                             }
+                        }
+
+                        for (const pet of this.report.friendlyPets) {
+
+                            const petList = this.playerPetMap.get(pet.petOwner);
+                            petList.push(pet);
+
+                            this.playerPetMap.set(pet.petOwner, petList);
+                            this.petIdMap.set(pet.id, pet);
                         }
 
                         this.code = code;
                         this.ready = true;
-
-                        if (nav) {
-
-                            this.router.navigate([`/report/${code}`]);
-                        }
 
                         resolve(this.report);
                     }
@@ -150,15 +163,19 @@ export class StorageService {
 
         return new Promise(
 
-            (resolve) => {
+            (resolve, reject) => {
 
-                const eventPromise = this.buildHelper(code, view, startTime, endTime, []);
-
-                eventPromise.then(
+                this.buildHelper(code, view, startTime, endTime, []).then(
 
                     (events: Event[]) => {
 
                         resolve(events);
+
+                    },
+
+                    (error) => {
+
+                        reject(error);
                     }
                 );
             }
@@ -169,7 +186,7 @@ export class StorageService {
 
         return new Promise(
 
-            (resolve) => {
+            (resolve, reject) => {
 
                 this.api.getEventsByCode(code, view, start.toString(), end.toString()).subscribe(
 
@@ -193,6 +210,11 @@ export class StorageService {
 
                             resolve(resp.events);
                         }
+                    },
+
+                    (resp: HttpErrorResponse) => {
+
+                        reject(resp.error.error);
                     }
                 );
             }

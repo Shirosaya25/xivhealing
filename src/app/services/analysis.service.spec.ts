@@ -1,12 +1,25 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AnalysisService } from './analysis.service';
 
-describe('AnalysisService', () => {
-  beforeEach(() => TestBed.configureTestingModule({}));
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-  it('should be created', () => {
-    const service: AnalysisService = TestBed.get(AnalysisService);
-    expect(service).toBeTruthy();
-  });
+describe('AnalysisService', () => {
+    beforeEach(() => TestBed.configureTestingModule({
+
+        imports: [
+
+            HttpClientModule, RouterTestingModule,
+
+            MatSnackBarModule
+        ]
+
+    }));
+
+    it('should be created', () => {
+        const service: AnalysisService = TestBed.get(AnalysisService);
+        expect(service).toBeTruthy();
+    });
 });

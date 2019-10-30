@@ -9,10 +9,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HomeComponent } from './components/home/home.component';
 import { SideNavComponent } from './components/side-nav/side-nav.component';
-import { ReportComponent } from './components/report/report.component';
 import { FightComponent } from './components/fight/fight.component';
 
 import { EventFilterPipe } from './pipes/event-filter.pipe';
+import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
 
 import { ProgressBarColorDirective } from './directives/progress-bar-color.directive';
 
@@ -30,7 +30,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -38,7 +38,6 @@ import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
         AppComponent,
         HomeComponent,
         SideNavComponent,
-        ReportComponent,
         ProgressBarColorDirective,
         FightComponent,
         EventFilterPipe,
@@ -52,7 +51,7 @@ import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
         MatToolbarModule, MatIconModule, MatProgressSpinnerModule,
         MatTreeModule, MatExpansionModule, MatListModule,
         MatGridListModule, MatProgressBarModule, MatCardModule,
-        MatRippleModule, MatTooltipModule
+        MatRippleModule, MatTooltipModule, MatSnackBarModule
     ],
 
     providers: [],

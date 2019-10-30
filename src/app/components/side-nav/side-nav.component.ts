@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { ApiService } from '../../services/api.service';
 import { StorageService } from '../../services/storage.service';
 import { AnalysisService } from '../../services/analysis.service';
+import { StateService } from '../../services/state.service';
 
-import { ReportFight } from '../../models/report';
+import { ReportFight, Report } from '../../models/report';
 
 @Component({
     selector: 'app-side-nav',
@@ -21,10 +23,12 @@ export class SideNavComponent implements OnInit {
 
     constructor(public api: ApiService,
                 public ss: StorageService,
-                public analysis: AnalysisService) { }
+                public analysis: AnalysisService,
+                private router: Router,
+                private state: StateService,
+                private route: ActivatedRoute) { }
 
     ngOnInit() {
-
     }
 
     submitUrl(): void {
@@ -39,7 +43,19 @@ export class SideNavComponent implements OnInit {
             return;
         }
 
-        this.ss.getReportByCode(code, true);
+        this.ss.getReportByCode(code).then(
+
+            (report: Report) => {
+
+                this.router.navigate([`/report/${code}`]);
+            },
+
+            (error) => {
+
+                this.state.openSnackBar(error, 5000);
+            }
+        );
+
         this.submitting = false;
     }
 
