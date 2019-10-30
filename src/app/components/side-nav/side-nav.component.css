@@ -66,3 +66,8 @@ mat-list-item:focus {
     margin-left: 10px;
     margin-right: 10px;
 }
+
+.tab-title {
+
+    font-size: 16px;
+}

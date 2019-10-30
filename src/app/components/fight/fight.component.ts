@@ -352,8 +352,6 @@ export class FightComponent implements OnInit {
                 icon = this.getIcon('000000-000103');
             }
 
-            const actors = this.ss.fightPlayerIdMap.get(this.analysis.fight.id);
-
             const curTime = data.entries[0].dataPoint.x;
             const curHp = Math.floor(data.entries[0].dataPoint.y / 100 * this.analysis.playerStatMap.get(this.activePlayer.id).hp);
             const source = this.ss.fightPlayerIdMap.get(this.analysis.fight.id).get(event.sourceID) ||

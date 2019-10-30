@@ -46,16 +46,6 @@ mat-grid-tile.active {
     cursor: pointer;
 }
 
-.mat-tooltip {
-
-    white-space: pre-line;
-}
-
-::ng-deep .ability-tooltip {
-
-    white-space: pre-line;
-}
-
 .icon-container {
 
     padding-right: 20px;

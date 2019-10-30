@@ -45,48 +45,29 @@
 
                 <div *ngIf="instance.kills.length !== 0">
 
-                    <p class="m-0 p-0">
-                        <font size="+1">Kills</font>
-                    </p>
+                    <ng-container *ngTemplateOutlet="pullList; context:{ $implicit: { title: 'Kills', pulls: instance.kills } }">
+                    </ng-container>
 
-                    <hr class="mb-1 mx-0 mt-0" />
-
-                    <mat-list class="instance-list">
-
-                        <mat-list-item *ngFor="let pull of instance.kills; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active mat-elevation-z6"
-                            class="px-2">
-
-                            <p class="m-0 p-0">
-                                {{idx + 1}}
-                            </p>
-
-                            <p class="m-0 p-0" style="margin-left: auto!important" [ngClass]="{'text-success': pull.kill, 'text-danger': !pull.kill}">
-                                ({{toFightTime(pull.start_time, pull.end_time)}})
-                            </p>
-
-                            <small class="m-0 p-0" style="margin-left: auto!important">
-                                {{toStartTime(pull.start_time) | date: 'shortTime'}}
-                            </small>
-
-                            <mat-progress-bar style="margin-left: auto; width: 60%" mode="determinate" [appProgressBarColor]="toColor(pull.bossPercentage)"
-                                [value]="toProgress(pull.bossPercentage)"></mat-progress-bar>
-                            
-                        </mat-list-item>
-
-                    </mat-list>
                 </div>
 
                 <div *ngIf="instance.wipes.length !== 0" class="mt-3">
 
-                    <p class="m-0 p-0">
-                        <font size="+1">Wipes</font>
+                    <ng-container *ngTemplateOutlet="pullList; context:{ $implicit: { title: 'Wipes', pulls: instance.wipes } }">
+                    </ng-container>
+
+                </div>
+
+                <ng-template #pullList let-info>
+
+                    <p class="m-0 p-0 tab-title">
+                        {{info.title}}
                     </p>
 
                     <hr class="mb-1 mx-0 mt-0" />
 
                     <mat-list class="instance-list">
 
-                        <mat-list-item *ngFor="let pull of instance.wipes; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active"
+                        <mat-list-item *ngFor="let pull of info.pulls; let idx = index" routerLink="/report/{{ss.code}}/{{pull.id}}" routerLinkActive="active"
                             class="px-2">
 
                             <p class="m-0 p-0">
@@ -107,7 +88,10 @@
                         </mat-list-item>
 
                     </mat-list>
-                </div>
+
+                </ng-template>
+
+
             </mat-expansion-panel>
         </mat-accordion>
     </div>

@@ -150,7 +150,6 @@ export class AnalysisService {
         }
 
         let lastType = '';
-        let lastPlayer = -1;
 
         for (const event of events) {
 
@@ -171,8 +170,6 @@ export class AnalysisService {
 
                 damageTakenEventList.push(newDamageTakenEvent);
                 this.damageTakenEventMap.set(event.targetID, damageTakenEventList);
-
-                lastPlayer = event.targetID;
 
             } else {
 

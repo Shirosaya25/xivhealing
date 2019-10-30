@@ -149,6 +149,20 @@ body {
     --text-primary-color: #{$light-primary-text};
     --text-primary-lighter-color: #{$dark-primary-text};
     --text-primary-darker-color: #{$light-primary-text};
+
+    --accent-color: #3843f9;
+    --accent-lighter-color: #c3c7fd;
+    --accent-darker-color: #242cf6;
+    --text-accent-color: #{$light-primary-text};
+    --text-accent-lighter-color: #{$dark-primary-text};
+    --text-accent-darker-color: #{$light-primary-text};
+
+    --warn-color: #ff0000;
+    --warn-lighter-color: #ffb3b3;
+    --warn-darker-color: #ff0000;
+    --text-warn-color: #{$light-primary-text};
+    --text-warn-lighter-color: #{$dark-primary-text};
+    --text-warn-darker-color: #{$light-primary-text};
 }
 
 $mat-primary: (
@@ -164,15 +178,6 @@ $mat-primary: (
 );
 $theme-primary: mat-palette($mat-primary, main, lighter, darker);
 
-body {
-    --accent-color: #3843f9;
-    --accent-lighter-color: #c3c7fd;
-    --accent-darker-color: #242cf6;
-    --text-accent-color: #{$light-primary-text};
-    --text-accent-lighter-color: #{$dark-primary-text};
-    --text-accent-darker-color: #{$light-primary-text};
-}
-
 $mat-accent: (
     main: #3843f9,
     lighter: #c3c7fd,
@@ -185,15 +190,6 @@ $mat-accent: (
     )
 );
 $theme-accent: mat-palette($mat-accent, main, lighter, darker);
-
-body {
-    --warn-color: #ff0000;
-    --warn-lighter-color: #ffb3b3;
-    --warn-darker-color: #ff0000;
-    --text-warn-color: #{$light-primary-text};
-    --text-warn-lighter-color: #{$dark-primary-text};
-    --text-warn-darker-color: #{$light-primary-text};
-}
 
 $mat-warn: (
     main: #ff0000,
@@ -249,4 +245,14 @@ input {
 
     background-color: #393939;
     color: white
+}
+
+.mat-tooltip {
+
+    white-space: pre-line;
+}
+
+.ability-tooltip {
+
+    white-space: pre-line;
 }
