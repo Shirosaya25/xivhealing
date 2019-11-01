@@ -53,6 +53,8 @@ export class FightComponent implements OnInit {
 
     chart: CanvasJS.Chart;
 
+    showMinor = false;
+
     constructor(private route: ActivatedRoute,
                 public ss: StorageService,
                 public analysis: AnalysisService,
@@ -384,8 +386,6 @@ export class FightComponent implements OnInit {
 
                     <p class="m-0 p-0">(${this.toFightTime(0, curTime)}) - ${this.activePlayer.name}</p>
                     <p class="m-0 p-0">HP: ${curHp} (${data.entries[0].dataPoint.y.toFixed(1)}%)</p>
-
-                    <hr style="border-color: white" class="m-0 p-0 mb-1"/>
 
                     <span style="display: flex;
                         align-items: center;

@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 
+import { AnalysisService } from '../services/analysis.service';
+import { StorageService } from '../services/storage.service';
+
 import { Friendly } from '../models/report';
 import { Event } from '../models/event';
 

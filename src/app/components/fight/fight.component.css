@@ -27,6 +27,14 @@ mat-grid-tile.active {
     text-align: center;
 }
 
+.card-title {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
 .event-container {
 
     margin-bottom: 100px;
@@ -129,4 +137,14 @@ canvas {
 .content-display {
 
     height: 97px;
+}
+
+mat-card-header {
+
+    align-items: center;
+}
+
+table {
+
+    width: 100%;
 }

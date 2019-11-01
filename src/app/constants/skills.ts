@@ -11,8 +11,8 @@ const skills = {
         path: '000000-000806',
         desc: 'Reprisal - Single Enemy\n' +
             ' - Reduces target\'s damage dealt by 10%\n' +
-            ' - Duration: 5s\n' +
-            ' - Recast: 60s'
+            ' - Duration: 10s\n' +
+            ' - Recast: 90s'
     },
 
     feint: {
@@ -175,6 +175,23 @@ const skills = {
             ' - Oath Gauge Cost: 50'
     },
 
+    cover: {
+
+        name: 'Cover',
+        type: 'ability',
+        cost: 50,
+        resource: 'gauge',
+        priority: 'b14',
+        path: '002000-002501',
+        desc: 'Cover - Single Ally\n' +
+            ' - Take all damage intended for another party member\n' +
+            ' - Duration: 12s\n' +
+            ' - Oath Gauge Cost: 50' +
+            ' - Can only be executed when target is closer than 10 yalms\n' +
+            ' - Does not activate for certain attacks'
+
+    },
+
     'raw intuition': {
 
         name: 'Raw Intuition',
@@ -185,7 +202,7 @@ const skills = {
         path: '002000-002559',
         desc: 'Raw Intuition - Self\n' +
             ' - Reduces damage taken by 20%\n' +
-            ' - Duration: 5s\n' +
+            ' - Duration: 6s\n' +
             ' - Recast: 25s\n' +
             ' - Shares a recast timer with Nascent Flash'
     },
@@ -201,8 +218,8 @@ const skills = {
         desc: 'Vengeance - Self\n' +
             ' - Reduces damage taken by 30%\n' +
             ' - Additional Effect: Delivers an attack with a potency of 55 each time you suffer physical damage\n' +
-            ' - Duration: 10s\n' +
-            ' - Recast: 120s\n'
+            ' - Duration: 15s\n' +
+            ' - Recast: 120s'
     },
 
     holmgang: {
@@ -215,8 +232,24 @@ const skills = {
         path: '000000-000266',
         desc: 'Holmgang - Self\n' +
             ' - Prevents most attacks from reducing your HP below 1\n' +
-            ' - Duration: 6s\n' +
+            ' - Duration: 8s\n' +
             ' - Recast: 4m'
+    },
+
+    'riddle of earth': {
+
+        name: 'Riddle of Earth',
+        type: 'ability',
+        cost: 0,
+        resource: '',
+        priority: 'b50',
+        path: '002000-002537',
+        desc: 'Riddle of Earth - Self\n' +
+            ' - Grants Earth\'s Reply if damage is taken when active\n' +
+            ' - Additional Effect: Extends Greased Lightning duration to maximum' +
+            ' - Earth\'s Reply Bonus: Reduces damage taken by 10% and nullifies all action direction requirements' +
+            ' - Duration: 30s\n' +
+            ' - Recast: 60s'
     },
 
     /** Healing */
@@ -305,6 +338,20 @@ const skills = {
             ' - Increases maximum HP by 20% and restores the amount increased\n' +
             ' - Additional Effect: Increases HP restored of self by 20%\n' +
             ' - Duration: 10s\n' +
+            ' - Recast: 90s'
+    },
+
+    mantra: {
+
+        name: 'Mantra',
+        type: 'ability',
+        cost: 0,
+        resource: '',
+        priority: 'c50',
+        path: '000000-000216',
+        desc: 'Mantra - Party\n' +
+            ' - Increases HP recovered from healing by 10%\n' +
+            ' - Duration: 15s\n' +
             ' - Recast: 90s'
     }
 

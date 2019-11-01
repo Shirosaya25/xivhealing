@@ -32,3 +32,8 @@ mat-sidenav-container {
 
     height: 100vh;
 }
+
+.mat-slide-toggle-label {
+
+    margin: 0px;
+}

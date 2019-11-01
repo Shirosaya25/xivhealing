@@ -17,7 +17,8 @@ const jobs = {
             'intervention',
             'divine veil',
             'passage of arms',
-            'clemency'
+            'clemency',
+            'cover'
         ]
     },
 
@@ -114,7 +115,10 @@ const jobs = {
 
             'feint',
             'second wind',
-            'bloodbath'
+            'bloodbath',
+
+            'riddle of earth',
+            'mantra'
         ]
     },
 
@@ -191,6 +195,8 @@ const jobs = {
         short: 'DNC',
         priority: 'd2',
         defensive: [
+
+            'second wind',
 
             'shield samba'
         ]

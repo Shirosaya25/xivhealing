@@ -7,9 +7,10 @@ import { SortSearchService } from '../services/sort-search.service';
 import { StateService } from '../services/state.service';
 
 import { ReportFight, Report, Friendly, PlayerStats } from '../models/report';
-import { Event, EventResponse, DamageTakenEvent, CastEvent, HealingEvent } from '../models/event';
+import { Event, EventResponse, DamageTakenEvent, CastEvent, HealingEvent, Mechanic } from '../models/event';
 
 import { jobs } from '../constants/jobs';
+import { blacklist } from '../constants/blacklist';
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +21,10 @@ export class AnalysisService {
 
     damageTakenEvents: DamageTakenEvent[];
     damageTakenEventMap: Map<number, DamageTakenEvent[]>;
+
+    damageTakenEventsCondensed: Event[][];
+    mechanicMap: Map<number, Mechanic>;
+    mechanics: number[];
 
     castMap: Map<number, CastEvent[]>;
     mitigationEventMap: Map<number, CastEvent[]>;
@@ -42,7 +47,6 @@ export class AnalysisService {
                 private sorts: SortSearchService,
                 private state: StateService) { }
 
-
     async analyze(code: string, fight: ReportFight): Promise<boolean> {
 
         this.$ready.emit(false);
@@ -52,6 +56,9 @@ export class AnalysisService {
 
         this.damageTakenEvents = [];
         this.damageTakenEventMap = new Map<number, DamageTakenEvent[]>();
+
+        this.damageTakenEventsCondensed = [];
+        this.mechanicMap = new Map<number, Mechanic>();
 
         this.castMap = new Map<number, CastEvent[]>();
         this.mitigationEventMap = new Map<number, CastEvent[]>();
@@ -150,6 +157,8 @@ export class AnalysisService {
         }
 
         let lastType = '';
+        let lastName = '';
+        let condensedIdx = -1;
 
         for (const event of events) {
 
@@ -194,6 +203,54 @@ export class AnalysisService {
 
                 }
 
+                if (!blacklist.includes(event.ability.guid)) {
+
+                    if (lastName !== event.ability.name) {
+
+                        this.damageTakenEventsCondensed.push([]);
+                        lastName = event.ability.name;
+                        condensedIdx ++;
+                    }
+
+                    this.damageTakenEventsCondensed[condensedIdx].push(event);
+
+                    const mech: Mechanic = this.mechanicMap.get(event.ability.guid) ||
+
+                        {
+                            name: event.ability.name,
+                            timestamps: [],
+                            eventMap: new Map<number, Event[]>()
+                        };
+
+                    const instance = mech.timestamps.find(
+
+                        (timestamp: number) => {
+
+                            return event.timestamp - timestamp < 1000;
+                        }
+
+                    ) || event.timestamp;
+
+                    const mechEvents = mech.eventMap.get(instance) || [];
+
+                    mechEvents.push(event);
+
+                    if (!mech.timestamps.some(
+
+                            (timestamp: number) => {
+
+                                return instance === timestamp;
+                            }
+
+                        )
+                    ) {
+
+                        mech.timestamps.push(event.timestamp);
+                    }
+
+                    mech.eventMap.set(instance, mechEvents);
+                    this.mechanicMap.set(event.ability.guid, mech);
+                }
             }
 
             if (event.type !== lastType && (lastType === '' || lastType === 'damage')) {
@@ -247,7 +304,9 @@ export class AnalysisService {
 
             lastType = event.type;
         }
+        console.log(this.mechanicMap);
 
+        this.mechanics = Array.from(this.mechanicMap.keys());
         this.$operation.emit(true);
     }
 

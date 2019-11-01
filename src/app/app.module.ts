@@ -14,6 +14,7 @@ import { FightComponent } from './components/fight/fight.component';
 
 import { EventFilterPipe } from './pipes/event-filter.pipe';
 import { AbilityFilterPipe } from './pipes/ability-filter.pipe';
+import { MinorFilterPipe } from './pipes/minor-filter.pipe';
 
 import { ProgressBarColorDirective } from './directives/progress-bar-color.directive';
 
@@ -32,7 +33,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTableModule } from '@angular/material/table';
+import { JobSortPipe } from './pipes/job-sort.pipe';
 
 @NgModule({
     declarations: [
@@ -42,7 +46,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         ProgressBarColorDirective,
         FightComponent,
         EventFilterPipe,
-        AbilityFilterPipe
+        AbilityFilterPipe,
+        MinorFilterPipe,
+        JobSortPipe
     ],
 
     imports: [
@@ -52,7 +58,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
         MatToolbarModule, MatIconModule, MatProgressSpinnerModule,
         MatTreeModule, MatExpansionModule, MatListModule,
         MatGridListModule, MatProgressBarModule, MatCardModule,
-        MatRippleModule, MatTooltipModule, MatSnackBarModule
+        MatRippleModule, MatTooltipModule, MatSnackBarModule,
+        MatSlideToggleModule, MatDividerModule, MatTableModule
     ],
 
     providers: [],

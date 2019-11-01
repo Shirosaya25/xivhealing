@@ -88,3 +88,10 @@ export interface HealingEvent extends Event {
     sourceInstance?: number;
     packetID?: number;
 }
+
+export interface Mechanic {
+
+    name: string;
+    timestamps: number[];
+    eventMap: Map<number, Event[]>;
+}
